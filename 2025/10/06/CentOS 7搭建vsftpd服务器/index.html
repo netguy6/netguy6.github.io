@@ -1,0 +1,942 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/pictogram.png">
+  <link rel="icon" href="/img/pictogram.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="net06">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一、vsftpd 概述vsftpd（Very Secure FTP Daemon）是 Linux 系统中主流的 FTP 服务器软件，核心优势在于高安全性与轻量高效，支持匿名用户、本地用户、虚拟用户三种认证方式，具备以下特点：  以低权限用户运行，降低对系统的潜在危害； 利用 chroot() 函数限制用户目录，防止越权访问系统文件； 高权限操作（如登录、文件权限修改）由特殊上层程序控制，需严格身份">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7搭建vsftpd服务器">
+<meta property="og:url" content="https://netguy6.github.io/2025/10/06/CentOS%207%E6%90%AD%E5%BB%BAvsftpd%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html">
+<meta property="og:site_name" content="net06">
+<meta property="og:description" content="一、vsftpd 概述vsftpd（Very Secure FTP Daemon）是 Linux 系统中主流的 FTP 服务器软件，核心优势在于高安全性与轻量高效，支持匿名用户、本地用户、虚拟用户三种认证方式，具备以下特点：  以低权限用户运行，降低对系统的潜在危害； 利用 chroot() 函数限制用户目录，防止越权访问系统文件； 高权限操作（如登录、文件权限修改）由特殊上层程序控制，需严格身份">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-06T05:29:05.540Z">
+<meta property="article:modified_time" content="2025-10-06T05:31:03.708Z">
+<meta property="article:author" content="net06">
+<meta property="article:tag" content="CentOS 7">
+<meta property="article:tag" content="vsftpd">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>CentOS 7搭建vsftpd服务器 - net06</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"netguy6.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>net06</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/business.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CentOS 7搭建vsftpd服务器"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-06 13:29" pubdate>
+          2025年10月6日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CentOS 7搭建vsftpd服务器</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="一、vsftpd-概述"><a href="#一、vsftpd-概述" class="headerlink" title="一、vsftpd 概述"></a>一、vsftpd 概述</h2><p>vsftpd（Very Secure FTP Daemon）是 Linux 系统中主流的 FTP 服务器软件，核心优势在于<strong>高安全性</strong>与<strong>轻量高效</strong>，支持匿名用户、本地用户、虚拟用户三种认证方式，具备以下特点：</p>
+<ul>
+<li>以低权限用户运行，降低对系统的潜在危害；</li>
+<li>利用 <code>chroot()</code> 函数限制用户目录，防止越权访问系统文件；</li>
+<li>高权限操作（如登录、文件权限修改）由特殊上层程序控制，需严格身份验证；</li>
+<li>支持 IPv6、带宽限制、日志审计、虚拟主机、被动模式等功能；</li>
+<li>完全开源免费，兼容 CentOS、Ubuntu、BSD 等 UNIX 类系统。</li>
+</ul>
+<h2 id="二、安装前准备"><a href="#二、安装前准备" class="headerlink" title="二、安装前准备"></a>二、安装前准备</h2><p>搭建前需处理防火墙与 SELinux 限制（避免端口或权限拦截），建议先测试环境临时关闭，正式环境按需配置规则。</p>
+<h3 id="1-防火墙配置"><a href="#1-防火墙配置" class="headerlink" title="1. 防火墙配置"></a>1. 防火墙配置</h3><h4 id="（1）临时关闭防火墙（测试用）"><a href="#（1）临时关闭防火墙（测试用）" class="headerlink" title="（1）临时关闭防火墙（测试用）"></a>（1）临时关闭防火墙（测试用）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 停止防火墙服务</span><br>systemctl stop firewalld<br><span class="hljs-comment"># 禁止防火墙开机自启</span><br>systemctl <span class="hljs-built_in">disable</span> firewalld<br></code></pre></td></tr></table></figure>
+
+<h4 id="（2）正式环境：开放-FTP-相关端口"><a href="#（2）正式环境：开放-FTP-相关端口" class="headerlink" title="（2）正式环境：开放 FTP 相关端口"></a>（2）正式环境：开放 FTP 相关端口</h4><p>vsftpd 需开放<strong>控制端口</strong>（默认 21，可自定义）和<strong>被动模式端口范围</strong>（数据传输用），示例如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 开放控制端口（如默认21，或自定义60021）</span><br>firewall-cmd --permanent --zone=public --add-port=21/tcp<br><span class="hljs-comment"># 开放主动模式数据端口（20，仅主动模式需开放）</span><br>firewall-cmd --permanent --zone=public --add-port=20/tcp<br><span class="hljs-comment"># 开放被动模式端口范围（示例：64000-65000，可自定义）</span><br>firewall-cmd --permanent --zone=public --add-port=64000-65000/tcp<br><span class="hljs-comment"># 重新加载规则</span><br>firewall-cmd --reload<br><span class="hljs-comment"># 验证开放端口</span><br>firewall-cmd --list-ports<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-SELinux-配置"><a href="#2-SELinux-配置" class="headerlink" title="2. SELinux 配置"></a>2. SELinux 配置</h3><p>SELinux 可能拦截 FTP 访问，需临时关闭或永久配置权限：</p>
+<h4 id="（1）临时关闭（测试用）"><a href="#（1）临时关闭（测试用）" class="headerlink" title="（1）临时关闭（测试用）"></a>（1）临时关闭（测试用）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">setenforce 0<br><span class="hljs-comment"># 验证状态（输出 Permissive 表示临时关闭）</span><br>getenforce<br></code></pre></td></tr></table></figure>
+
+<h4 id="（2）永久关闭（或配置权限）"><a href="#（2）永久关闭（或配置权限）" class="headerlink" title="（2）永久关闭（或配置权限）"></a>（2）永久关闭（或配置权限）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 编辑 SELinux 配置文件</span><br>vim /etc/selinux/config<br><span class="hljs-comment"># 将 SELINUX=enforcing 改为 SELINUX=disabled</span><br>SELINUX=disabled<br><span class="hljs-comment"># 保存后重启系统生效（或临时生效用 setenforce 0）</span><br><br><span class="hljs-comment"># 若不关闭 SELINUX，可允许 FTP 全权限（推荐）</span><br>setsebool -P ftpd_full_access on<br></code></pre></td></tr></table></figure>
+
+<h2 id="三、vsftpd-安装与基础运维"><a href="#三、vsftpd-安装与基础运维" class="headerlink" title="三、vsftpd 安装与基础运维"></a>三、vsftpd 安装与基础运维</h2><h3 id="1-检查是否已安装"><a href="#1-检查是否已安装" class="headerlink" title="1. 检查是否已安装"></a>1. 检查是否已安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 方法1：查看已安装的 vsftpd 包</span><br>rpm -qa | grep vsftpd<br><span class="hljs-comment"># 方法2：查看 vsftpd 版本</span><br>vsftpd -v<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-安装-vsftpd"><a href="#2-安装-vsftpd" class="headerlink" title="2. 安装 vsftpd"></a>2. 安装 vsftpd</h3><p>通过 yum 一键安装（CentOS 官方源默认包含）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install -y vsftpd<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-服务运维命令"><a href="#3-服务运维命令" class="headerlink" title="3. 服务运维命令"></a>3. 服务运维命令</h3><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动服务</td>
+<td><code>systemctl start vsftpd.service</code></td>
+</tr>
+<tr>
+<td>停止服务</td>
+<td><code>systemctl stop vsftpd.service</code></td>
+</tr>
+<tr>
+<td>重启服务（配置生效）</td>
+<td><code>systemctl restart vsftpd.service</code></td>
+</tr>
+<tr>
+<td>查看服务状态</td>
+<td><code>systemctl status vsftpd.service</code></td>
+</tr>
+<tr>
+<td>开机自启</td>
+<td><code>systemctl enable vsftpd.service</code></td>
+</tr>
+<tr>
+<td>禁止开机自启</td>
+<td><code>systemctl disable vsftpd.service</code></td>
+</tr>
+</tbody></table>
+<h2 id="四、核心配置（vsftpd-conf）"><a href="#四、核心配置（vsftpd-conf）" class="headerlink" title="四、核心配置（vsftpd.conf）"></a>四、核心配置（vsftpd.conf）</h2><p>vsftpd 主配置文件路径：<code>/etc/vsftpd/vsftpd.conf</code>，建议先备份原配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cp</span> /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.backup<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-comment">#是否允许匿名，默认no</span><br><span class="hljs-attr">anonymous_enable</span>=<span class="hljs-literal">NO</span><br><br><span class="hljs-comment">#这个设定值必须要为YES 时，在/etc/passwd内的账号才能以实体用户的方式登入我们的vsftpd主机</span><br><span class="hljs-attr">local_enable</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#具有写权限</span><br><span class="hljs-attr">write_enable</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#本地用户创建文件或目录的掩码</span><br><span class="hljs-attr">local_umask</span>=<span class="hljs-number">022</span><br><br><span class="hljs-comment">#当dirmessage_enable=YES时，可以设定这个项目来让vsftpd寻找该档案来显示讯息！您也可以设定其它档名！</span><br><span class="hljs-attr">dirmessage_enable</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#当设定为YES时，使用者上传与下载日志都会被纪录起来。记录日志与下一个xferlog_file设定选项有关</span><br><span class="hljs-attr">xferlog_enable</span>=<span class="hljs-literal">YES</span>xferlog_std_format=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#上传与下载日志存放路径</span><br><span class="hljs-attr">xferlog_file</span>=/var/log/xferlog <br><br><span class="hljs-comment">#开启20端口</span><br><span class="hljs-attr">connect_from_port_20</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#关于系统安全的设定值：</span><br><span class="hljs-comment">#ascii_download_enable=YES(NO)</span><br><span class="hljs-comment">#如果设定为YES ，那么 client 就可以使用 ASCII 格式下载档案。</span><br><span class="hljs-comment">#一般来说，由于启动了这个设定项目可能会导致DoS 的攻击，因此预设是NO。</span><br><span class="hljs-comment">#ascii_upload_enable=YES(NO)</span><br><span class="hljs-comment">#与上一个设定类似的，只是这个设定针对上传而言！预设是NO。</span><br><span class="hljs-attr">ascii_upload_enable</span>=<span class="hljs-literal">NO</span><br><span class="hljs-attr">ascii_download_enable</span>=<span class="hljs-literal">NO</span><br><span class="hljs-comment">#通过搭配能实现以下几种效果： </span><br><span class="hljs-comment">#①当chroot_list_enable=YES，chroot_local_user=YES时，在/etc/vsftpd.chroot_list文件中列出的用户，可以切换到其他目录；未在文件中列出的用户，不能切换到其他目录。 </span><br><span class="hljs-comment">#②当chroot_list_enable=YES，chroot_local_user=NO时，在/etc/vsftpd.chroot_list文件中列出的用户，不能切换到其他目录；未在文件中列出的用户，可以切换到其他目录。 </span><br><span class="hljs-comment">#③当chroot_list_enable=NO，chroot_local_user=YES时，所有的用户均不能切换到其他目录。 </span><br><span class="hljs-comment">#④当chroot_list_enable=NO，chroot_local_user=NO时，所有的用户均可以切换到其他目录。</span><br><br><span class="hljs-attr">chroot_local_user</span>=<span class="hljs-literal">YES</span><br><span class="hljs-attr">chroot_list_enable</span>=<span class="hljs-literal">YES</span><br><span class="hljs-attr">chroot_list_file</span>=/etc/vsftpd/chroot_list<br><br><span class="hljs-comment">#这个是pam模块的名称，我们放置在/etc/pam.d/vsftpd</span><br><span class="hljs-attr">pam_service_name</span>=vsftpd<br><br><span class="hljs-comment">#当然我们都习惯支持TCP Wrappers的啦！</span><br><span class="hljs-attr">tcp_wrappers</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#不添加下面这个会报错：500 OOPS: vsftpd: refusing to run with writable root inside chroot()</span><br><span class="hljs-attr">allow_writeable_chroot</span>=<span class="hljs-literal">YES</span><br><br><span class="hljs-comment">#ftp的端口号</span><br><span class="hljs-attr">listen_port</span>=<span class="hljs-number">60021</span><br><span class="hljs-comment">#启动被动式联机(passivemode)</span><br><span class="hljs-attr">pasv_enable</span>=<span class="hljs-literal">YES</span><br><span class="hljs-comment">#上面两个是与passive mode 使用的 port number 有关，如果您想要使用65400到65410 这 11 个 port 来进行被动式资料的连接，可以这样设定</span><br><span class="hljs-attr">pasv_min_port</span>=<span class="hljs-number">65400</span><br><span class="hljs-attr">pasv_max_port</span>=<span class="hljs-number">65410</span><br><br><span class="hljs-comment">#FTP访问目录</span><br><span class="hljs-attr">local_root</span>=/data/ftp/<br></code></pre></td></tr></table></figure>
+
+<p>以下是核心配置参数，按功能分类：</p>
+<h3 id="1-基础访问控制"><a href="#1-基础访问控制" class="headerlink" title="1. 基础访问控制"></a>1. 基础访问控制</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>取值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>anonymous_enable</code></td>
+<td>YES&#x2F;NO</td>
+<td>是否允许匿名用户登录（默认 YES，安全起见设为 <strong>NO</strong>）</td>
+</tr>
+<tr>
+<td><code>local_enable</code></td>
+<td>YES&#x2F;NO</td>
+<td>是否允许本地系统用户（&#x2F;etc&#x2F;passwd 中的用户）登录（必须设为 <strong>YES</strong>）</td>
+</tr>
+<tr>
+<td><code>write_enable</code></td>
+<td>YES&#x2F;NO</td>
+<td>是否允许用户写操作（上传、删除、创建目录，需设为 <strong>YES</strong> 才支持）</td>
+</tr>
+<tr>
+<td><code>local_umask</code></td>
+<td>022</td>
+<td>本地用户创建文件 &#x2F; 目录的权限掩码（文件：644&#x3D;666-022，目录：755&#x3D;777-022）</td>
+</tr>
+</tbody></table>
+<h3 id="2-目录限制（chroot-配置）"><a href="#2-目录限制（chroot-配置）" class="headerlink" title="2. 目录限制（chroot 配置）"></a>2. 目录限制（chroot 配置）</h3><p><code>chroot</code> 用于将用户禁锢在指定目录，防止访问系统其他文件，核心参数组合如下：</p>
+<table>
+<thead>
+<tr>
+<th><code>chroot_local_user</code></th>
+<th><code>chroot_list_enable</code></th>
+<th><code>chroot_list_file</code> 作用</th>
+<th>效果总结</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>YES</td>
+<td>YES</td>
+<td>列出的用户 <strong>允许</strong> 切换到其他目录</td>
+<td>仅列表内用户可越权，其余用户被禁锢</td>
+</tr>
+<tr>
+<td>YES</td>
+<td>NO</td>
+<td>无效</td>
+<td><strong>所有用户</strong> 均被禁锢在主目录</td>
+</tr>
+<tr>
+<td>NO</td>
+<td>YES</td>
+<td>列出的用户 <strong>禁止</strong> 切换到其他目录</td>
+<td>仅列表内用户被禁锢，其余用户可越权</td>
+</tr>
+<tr>
+<td>NO</td>
+<td>NO</td>
+<td>无效</td>
+<td><strong>所有用户</strong> 均允许切换到其他目录（不推荐）</td>
+</tr>
+</tbody></table>
+<p><strong>必加参数</strong>：<code>allow_writeable_chroot=YES</code> → 解决 “500 OOPS: vsftpd: refusing to run with writable root inside chroot ()” 报错（允许被禁锢用户的主目录有写权限）。</p>
+<h3 id="3-被动模式配置"><a href="#3-被动模式配置" class="headerlink" title="3. 被动模式配置"></a>3. 被动模式配置</h3><p>FTP 被动模式更适合客户端在防火墙后（如家庭网络），需指定端口范围：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment"># 启用被动模式</span><br><span class="hljs-attribute">pasv_enable</span>=YES<br><span class="hljs-comment"># 被动模式最小端口（自定义，如 64000）</span><br><span class="hljs-attribute">pasv_min_port</span>=<span class="hljs-number">64000</span><br><span class="hljs-comment"># 被动模式最大端口（自定义，如 65000）</span><br><span class="hljs-attribute">pasv_max_port</span>=<span class="hljs-number">65000</span><br><span class="hljs-comment"># 自定义控制端口（默认 21，可选，如 60021）</span><br><span class="hljs-attribute">listen_port</span>=<span class="hljs-number">60021</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-日志与安全配置"><a href="#4-日志与安全配置" class="headerlink" title="4. 日志与安全配置"></a>4. 日志与安全配置</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment"># 启用上传/下载日志</span><br><span class="hljs-attribute">xferlog_enable</span>=YES<br><span class="hljs-comment"># 日志格式（标准格式）</span><br><span class="hljs-attribute">xferlog_std_format</span>=YES<br><span class="hljs-comment"># 日志路径</span><br><span class="hljs-attribute">xferlog_file</span>=/var/log/xferlog<br><span class="hljs-comment"># 禁止 ASCII 格式上传/下载（防止 DoS 攻击，默认 NO）</span><br><span class="hljs-attribute">ascii_upload_enable</span>=NO<br><span class="hljs-attribute">ascii_download_enable</span>=NO<br><span class="hljs-comment"># PAM 认证模块（默认 vsftpd，对应 /etc/pam.d/vsftpd）</span><br><span class="hljs-attribute">pam_service_name</span>=vsftpd<br><span class="hljs-comment"># 支持 TCP Wrappers（增强安全性）</span><br><span class="hljs-attribute">tcp_wrappers</span>=YES<br><span class="hljs-comment"># 本地用户默认访问目录（自定义，如 /data/ftp）</span><br><span class="hljs-attribute">local_root</span>=/data/ftp<br></code></pre></td></tr></table></figure>
+
+<h2 id="五、用户管理"><a href="#五、用户管理" class="headerlink" title="五、用户管理"></a>五、用户管理</h2><p>vsftpd 支持<strong>本地用户</strong>和<strong>虚拟用户</strong>，虚拟用户与系统用户隔离，安全性更高，以下分两种场景配置：</p>
+<h3 id="1-本地用户配置（单用户-简单场景）"><a href="#1-本地用户配置（单用户-简单场景）" class="headerlink" title="1. 本地用户配置（单用户 &#x2F; 简单场景）"></a>1. 本地用户配置（单用户 &#x2F; 简单场景）</h3><h4 id="（1）创建本地用户"><a href="#（1）创建本地用户" class="headerlink" title="（1）创建本地用户"></a>（1）创建本地用户</h4><p>创建仅用于 FTP 登录、禁止 SSH 登录的用户（如 <code>ftpuser</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># -d：指定主目录（与 local_root 一致，如 /data/ftp）</span><br><span class="hljs-comment"># -s：指定登录shell（/sbin/nologin 或 /usr/bin/nologin，禁止 SSH 登录）</span><br><span class="hljs-comment"># -M：不自动创建主目录（已手动创建则加）</span><br>useradd -d /data/ftp -s /sbin/nologin ftpuser<br><br><span class="hljs-comment"># 若提示“shell /sbin/nologin does not exist”，需添加到 /etc/shells</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;/sbin/nologin&quot;</span> &gt;&gt; /etc/shells<br></code></pre></td></tr></table></figure>
+
+<h4 id="（2）设置用户密码"><a href="#（2）设置用户密码" class="headerlink" title="（2）设置用户密码"></a>（2）设置用户密码</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 交互设置密码</span><br>passwd ftpuser<br><span class="hljs-comment"># 非交互设置密码（如密码 ftppassword）</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;ftppassword&quot;</span> | passwd --stdin ftpuser<br></code></pre></td></tr></table></figure>
+
+<h4 id="（3）配置目录权限"><a href="#（3）配置目录权限" class="headerlink" title="（3）配置目录权限"></a>（3）配置目录权限</h4><p>确保用户对主目录有访问权限：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建主目录（若未创建）</span><br><span class="hljs-built_in">mkdir</span> -p /data/ftp<br><span class="hljs-comment"># 设置目录所有者为 ftpuser</span><br><span class="hljs-built_in">chown</span> -R ftpuser:ftpuser /data/ftp<br><span class="hljs-comment"># 设置目录权限（755：用户可读写执行，其他只读执行）</span><br><span class="hljs-built_in">chmod</span> -R 755 /data/ftp<br><br><span class="hljs-comment"># （可选）创建上传目录（单独授权写权限）</span><br><span class="hljs-built_in">mkdir</span> -p /data/ftp/upload<br><span class="hljs-built_in">chown</span> ftpuser:ftpuser /data/ftp/upload<br><span class="hljs-built_in">chmod</span> 755 /data/ftp/upload<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-虚拟用户配置（多用户-高安全场景）"><a href="#2-虚拟用户配置（多用户-高安全场景）" class="headerlink" title="2. 虚拟用户配置（多用户 &#x2F; 高安全场景）"></a>2. 虚拟用户配置（多用户 &#x2F; 高安全场景）</h3><p>虚拟用户仅存在于 FTP 服务中，与系统用户隔离，适合多用户管理。</p>
+<h4 id="（1）创建宿主系统用户"><a href="#（1）创建宿主系统用户" class="headerlink" title="（1）创建宿主系统用户"></a>（1）创建宿主系统用户</h4><p>虚拟用户需映射到一个低权限的系统宿主用户（如 <code>vsftpd_guest</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建宿主用户，禁止 SSH 登录，主目录 /home/vsftpd</span><br>useradd -d /home/vsftpd -s /sbin/nologin vsftpd_guest<br><span class="hljs-comment"># 设置目录权限</span><br><span class="hljs-built_in">chown</span> -R vsftpd_guest:vsftpd_guest /home/vsftpd<br><span class="hljs-built_in">chmod</span> -R 755 /home/vsftpd<br></code></pre></td></tr></table></figure>
+
+<h4 id="（2）创建虚拟用户列表"><a href="#（2）创建虚拟用户列表" class="headerlink" title="（2）创建虚拟用户列表"></a>（2）创建虚拟用户列表</h4><p>创建文本文件存储虚拟用户账号密码（一行账号、一行密码）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/vsftpd/vuser_passwd<br><span class="hljs-comment"># 内容示例（用户 wcj、hss，密码均为 123456）</span><br>wcj<br>123456<br>hss<br>123456<br></code></pre></td></tr></table></figure>
+
+<h4 id="（3）生成虚拟用户数据库文件"><a href="#（3）生成虚拟用户数据库文件" class="headerlink" title="（3）生成虚拟用户数据库文件"></a>（3）生成虚拟用户数据库文件</h4><p>vsftpd 需读取数据库格式的用户文件，用 <code>db_load</code> 生成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># -T：转换格式，-t hash：哈希算法，-f：源文件，输出 db 文件</span><br>db_load -T -t <span class="hljs-built_in">hash</span> -f /etc/vsftpd/vuser_passwd /etc/vsftpd/vuser_passwd.db<br><span class="hljs-comment"># 设置权限（仅 root 可读，防止密码泄露）</span><br><span class="hljs-built_in">chmod</span> 600 /etc/vsftpd/vuser_passwd.db<br></code></pre></td></tr></table></figure>
+
+<h4 id="（4）配置虚拟用户独立目录"><a href="#（4）配置虚拟用户独立目录" class="headerlink" title="（4）配置虚拟用户独立目录"></a>（4）配置虚拟用户独立目录</h4><p>为每个虚拟用户创建独立配置文件，实现目录隔离：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建虚拟用户配置目录</span><br><span class="hljs-built_in">mkdir</span> /etc/vsftpd/vuser_conf<br><br><span class="hljs-comment"># 为每个用户创建配置文件（如 wcj、hss）</span><br><span class="hljs-built_in">touch</span> /etc/vsftpd/vuser_conf/wcj<br><span class="hljs-built_in">touch</span> /etc/vsftpd/vuser_conf/hss<br></code></pre></td></tr></table></figure>
+
+<h4 id="（5）编辑虚拟用户配置"><a href="#（5）编辑虚拟用户配置" class="headerlink" title="（5）编辑虚拟用户配置"></a>（5）编辑虚拟用户配置</h4><p>以用户 <code>wcj</code> 为例，配置其独立目录和权限：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/vsftpd/vuser_conf/wcj<br><span class="hljs-comment"># 内容如下</span><br>local_root=/home/vsftpd/wcj  <span class="hljs-comment"># wcj 的 FTP 目录</span><br>write_enable=YES             <span class="hljs-comment"># 允许写操作</span><br>anon_world_readable_only=NO  <span class="hljs-comment"># 允许浏览目录</span><br>anon_upload_enable=YES       <span class="hljs-comment"># 允许上传</span><br>anon_mkdir_write_enable=YES  <span class="hljs-comment"># 允许创建目录</span><br>anon_other_write_enable=YES  <span class="hljs-comment"># 允许删除/重命名</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="（6）创建用户目录并授权"><a href="#（6）创建用户目录并授权" class="headerlink" title="（6）创建用户目录并授权"></a>（6）创建用户目录并授权</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 为每个虚拟用户创建目录</span><br><span class="hljs-built_in">mkdir</span> -p /home/vsftpd/wcj /home/vsftpd/hss<br><span class="hljs-comment"># 创建上传子目录（解决主目录写权限问题）</span><br><span class="hljs-built_in">mkdir</span> -p /home/vsftpd/wcj/upload /home/vsftpd/hss/upload<br><span class="hljs-comment"># 授权（宿主用户 vsftpd_guest 拥有权限）</span><br><span class="hljs-built_in">chown</span> -R vsftpd_guest:vsftpd_guest /home/vsftpd<br><span class="hljs-built_in">chmod</span> -R 755 /home/vsftpd<br><span class="hljs-built_in">chmod</span> 777 /home/vsftpd/wcj/upload /home/vsftpd/hss/upload<br></code></pre></td></tr></table></figure>
+
+<h4 id="（7）修改-vsftpd-conf-启用虚拟用户"><a href="#（7）修改-vsftpd-conf-启用虚拟用户" class="headerlink" title="（7）修改 vsftpd.conf 启用虚拟用户"></a>（7）修改 vsftpd.conf 启用虚拟用户</h4><p>在 <code>vsftpd.conf</code> 末尾添加：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment"># 启用虚拟用户功能</span><br><span class="hljs-attribute">guest_enable</span>=YES<br><span class="hljs-comment"># 虚拟用户映射的宿主用户（即 vsftpd_guest）</span><br><span class="hljs-attribute">guest_username</span>=vsftpd_guest<br><span class="hljs-comment"># 虚拟用户配置文件目录</span><br><span class="hljs-attribute">user_config_dir</span>=/etc/vsftpd/vuser_conf<br><span class="hljs-comment"># 虚拟用户权限：YES 与本地用户同权，NO 与匿名用户同权（默认 NO）</span><br><span class="hljs-attribute">virtual_use_local_privs</span>=YES<br><span class="hljs-comment"># 被动模式端口范围（与前文一致）</span><br><span class="hljs-attribute">pasv_min_port</span>=<span class="hljs-number">10060</span><br><span class="hljs-attribute">pasv_max_port</span>=<span class="hljs-number">10090</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="六、服务测试"><a href="#六、服务测试" class="headerlink" title="六、服务测试"></a>六、服务测试</h2><p>配置完成后重启 vsftpd，通过以下方式测试是否正常运行：</p>
+<h3 id="1-终端测试（ftp-lftp-命令）"><a href="#1-终端测试（ftp-lftp-命令）" class="headerlink" title="1. 终端测试（ftp&#x2F;lftp 命令）"></a>1. 终端测试（ftp&#x2F;lftp 命令）</h3><h4 id="（1）ftp-命令"><a href="#（1）ftp-命令" class="headerlink" title="（1）ftp 命令"></a>（1）ftp 命令</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 连接 FTP 服务器（IP 为服务器地址，端口默认 21，自定义需加端口）</span><br>ftp 192.168.10.110 21<br><span class="hljs-comment"># 输入用户名（本地用户 ftpuser 或虚拟用户 wcj）</span><br>Name (192.168.10.110:root): ftpuser<br><span class="hljs-comment"># 输入密码</span><br>Password:<br><span class="hljs-comment"># 登录成功后，执行操作（示例）</span><br>ftp&gt; <span class="hljs-built_in">ls</span>  <span class="hljs-comment"># 查看目录</span><br>ftp&gt; <span class="hljs-built_in">cd</span> upload  <span class="hljs-comment"># 进入上传目录</span><br>ftp&gt; put test.txt  <span class="hljs-comment"># 上传本地文件 test.txt</span><br>ftp&gt; get test.txt  <span class="hljs-comment"># 下载服务器文件 test.txt</span><br>ftp&gt; <span class="hljs-built_in">bye</span>  <span class="hljs-comment"># 退出连接</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="（2）lftp-命令（支持非交互登录）"><a href="#（2）lftp-命令（支持非交互登录）" class="headerlink" title="（2）lftp 命令（支持非交互登录）"></a>（2）lftp 命令（支持非交互登录）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 格式：lftp 用户名:密码@IP:端口</span><br>lftp ftpuser:ftppassword@192.168.10.110:21<br><span class="hljs-comment"># 执行操作</span><br>lftp ftpuser@192.168.10.110:/&gt; <span class="hljs-built_in">ls</span><br>lftp ftpuser@192.168.10.110:/&gt; <span class="hljs-built_in">cd</span> upload<br>lftp ftpuser@192.168.10.110:/upload&gt; put test.txt<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-浏览器测试"><a href="#2-浏览器测试" class="headerlink" title="2. 浏览器测试"></a>2. 浏览器测试</h3><p>在浏览器地址栏输入 <code>ftp://服务器IP:端口</code>，输入用户名密码后，可查看目录和下载文件（浏览器仅支持下载，不支持上传）。</p>
+<h3 id="3-客户端测试（推荐）"><a href="#3-客户端测试（推荐）" class="headerlink" title="3. 客户端测试（推荐）"></a>3. 客户端测试（推荐）</h3><p>使用 FTP 客户端（如 FileZilla、FlashFXP）：</p>
+<ul>
+<li>主机：服务器 IP</li>
+<li>端口：21（或自定义端口）</li>
+<li>用户名 &#x2F; 密码：本地用户或虚拟用户账号</li>
+<li>连接后可上传、下载、管理文件，直观验证功能。</li>
+</ul>
+<h2 id="七、常见问题与解决"><a href="#七、常见问题与解决" class="headerlink" title="七、常见问题与解决"></a>七、常见问题与解决</h2><h3 id="1-报错：500-OOPS-could-not-read-chroot-list-file-etc-vsftpd-chroot-list"><a href="#1-报错：500-OOPS-could-not-read-chroot-list-file-etc-vsftpd-chroot-list" class="headerlink" title="1. 报错：500 OOPS: could not read chroot list file:&#x2F;etc&#x2F;vsftpd&#x2F;chroot_list"></a>1. 报错：500 OOPS: could not read chroot list file:&#x2F;etc&#x2F;vsftpd&#x2F;chroot_list</h3><p><strong>原因</strong>：配置了 <code>chroot_list_file=/etc/vsftpd/chroot_list</code>，但该文件不存在。<strong>解决</strong>：创建空的 chroot_list 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">touch</span> /etc/vsftpd/chroot_list<br><span class="hljs-comment"># 若需允许特定用户越权，将用户名添加到文件（一行一个）</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;ftpuser&quot;</span> &gt;&gt; /etc/vsftpd/chroot_list<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-报错：500-OOPS-chroot"><a href="#2-报错：500-OOPS-chroot" class="headerlink" title="2. 报错：500 OOPS: chroot"></a>2. 报错：500 OOPS: chroot</h3><p><strong>原因</strong>：SELinux 限制了 chroot 操作。<strong>解决</strong>：临时关闭 SELinux（<code>setenforce 0</code>）或永久关闭（修改 <code>/etc/selinux/config</code>），或设置 SELinux 权限：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">setsebool -P ftpd_full_access on<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-登录失败：331-Please-specify-the-password-后报错"><a href="#3-登录失败：331-Please-specify-the-password-后报错" class="headerlink" title="3. 登录失败：331 Please specify the password. 后报错"></a>3. 登录失败：331 Please specify the password. 后报错</h3><p><strong>原因</strong>：</p>
+<ul>
+<li><p>用户不在允许登录列表（<code>user_list</code>）；</p>
+</li>
+<li><p>用户在禁止登录列表（<code>/etc/vsftpd/ftpusers</code>）；</p>
+</li>
+<li><p>目录权限不足。</p>
+<p><strong>解决</strong>：</p>
+</li>
+<li><p>将用户添加到 <code>/etc/vsftpd/user_list</code>（一行一个）；</p>
+</li>
+<li><p>确保用户不在 <code>/etc/vsftpd/ftpusers</code> 中；</p>
+</li>
+<li><p>重新配置目录权限（<code>chown -R 用户名:组 /目录</code>，<code>chmod -R 755 /目录</code>）。</p>
+</li>
+</ul>
+<h2 id="八、进阶配置：FTPS-加密传输"><a href="#八、进阶配置：FTPS-加密传输" class="headerlink" title="八、进阶配置：FTPS 加密传输"></a>八、进阶配置：FTPS 加密传输</h2><p>FTP 默认明文传输，通过 FTPS（FTP over SSL&#x2F;TLS）加密数据，需生成 SSL 证书：</p>
+<h3 id="1-安装-openssl"><a href="#1-安装-openssl" class="headerlink" title="1. 安装 openssl"></a>1. 安装 openssl</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install -y openssl openssl-devel<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-生成-CA-私钥与自签证书"><a href="#2-生成-CA-私钥与自签证书" class="headerlink" title="2. 生成 CA 私钥与自签证书"></a>2. 生成 CA 私钥与自签证书</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 生成 CA 私钥（2048位，路径 /etc/pki/CA/private/cakey.pem）</span><br>openssl genrsa -out /etc/pki/CA/private/cakey.pem 2048<br><span class="hljs-built_in">chmod</span> 400 /etc/pki/CA/private/cakey.pem<br><br><span class="hljs-comment"># 生成 CA 自签证书（有效期 365 天）</span><br>openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 365<br><span class="hljs-comment"># 按提示输入信息（Country Name、State 等，可随意填写）</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-生成-vsftpd-证书与私钥"><a href="#3-生成-vsftpd-证书与私钥" class="headerlink" title="3. 生成 vsftpd 证书与私钥"></a>3. 生成 vsftpd 证书与私钥</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建证书目录</span><br><span class="hljs-built_in">mkdir</span> -p /etc/vsftpd/.ssl<br><span class="hljs-built_in">chmod</span> 400 /etc/vsftpd/.ssl<br><br><span class="hljs-comment"># 生成 vsftpd 私钥</span><br>openssl genrsa -out /etc/vsftpd/.ssl/vsftpd.key 2048<br><span class="hljs-built_in">chmod</span> 400 /etc/vsftpd/.ssl/vsftpd.key<br><br><span class="hljs-comment"># 生成证书请求文件</span><br>openssl req -new -key /etc/vsftpd/.ssl/vsftpd.key -out /etc/vsftpd/.ssl/vsftpd.csr<br><br><span class="hljs-comment"># 签发 vsftpd 证书（需先初始化 CA 索引和序列号）</span><br><span class="hljs-built_in">touch</span> /etc/pki/CA/index.txt<br><span class="hljs-built_in">echo</span> 01 &gt; /etc/pki/CA/serial<br>openssl ca -<span class="hljs-keyword">in</span> /etc/vsftpd/.ssl/vsftpd.csr -out /etc/vsftpd/.ssl/vsftpd.crt -days 365<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-配置-vsftpd-启用-SSL"><a href="#4-配置-vsftpd-启用-SSL" class="headerlink" title="4. 配置 vsftpd 启用 SSL"></a>4. 配置 vsftpd 启用 SSL</h3><p>在 <code>vsftpd.conf</code> 末尾添加：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment"># 启用 SSL</span><br><span class="hljs-attribute">ssl_enable</span>=YES<br><span class="hljs-comment"># 强制本地用户登录和数据传输加密</span><br><span class="hljs-attribute">force_local_logins_ssl</span>=YES<br><span class="hljs-attribute">force_local_data_ssl</span>=YES<br><span class="hljs-comment"># 禁用 SSL 会话重用</span><br><span class="hljs-attribute">require_ssl_reuse</span>=NO<br><span class="hljs-comment"># 支持的 SSL 版本</span><br><span class="hljs-attribute">ssl_tlsv1</span>=YES<br><span class="hljs-attribute">ssl_sslv2</span>=YES<br><span class="hljs-attribute">ssl_sslv3</span>=YES<br><span class="hljs-comment"># SSL 密码等级</span><br><span class="hljs-attribute">ssl_ciphers</span>=HIGH<br><span class="hljs-comment"># 证书和私钥路径</span><br><span class="hljs-attribute">rsa_cert_file</span>=/etc/vsftpd/.ssl/vsftpd.crt<br><span class="hljs-attribute">rsa_private_key_file</span>=/etc/vsftpd/.ssl/vsftpd.key<br><span class="hljs-comment"># 启用 SSL 调试日志</span><br><span class="hljs-attribute">debug_ssl</span>=YES<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-重启服务并测试"><a href="#5-重启服务并测试" class="headerlink" title="5. 重启服务并测试"></a>5. 重启服务并测试</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl restart vsftpd<br><span class="hljs-comment"># 使用支持 FTPS 的客户端（如 FileZilla），选择“FTP over TLS”连接</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="九、常用-FTP-命令"><a href="#九、常用-FTP-命令" class="headerlink" title="九、常用 FTP 命令"></a>九、常用 FTP 命令</h2><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ascii</code></td>
+<td>以 ASCII 格式传输文件（默认）</td>
+</tr>
+<tr>
+<td><code>binary</code></td>
+<td>以二进制格式传输文件（推荐，避免文件损坏）</td>
+</tr>
+<tr>
+<td><code>get 远程文件 [本地文件]</code></td>
+<td>下载远程文件到本地</td>
+</tr>
+<tr>
+<td><code>put 本地文件 [远程文件]</code></td>
+<td>上传本地文件到远程</td>
+</tr>
+<tr>
+<td><code>mget 远程文件列表</code></td>
+<td>批量下载文件（如 <code>mget *.txt</code>）</td>
+</tr>
+<tr>
+<td><code>mput 本地文件列表</code></td>
+<td>批量上传文件（如 <code>mput *.txt</code>）</td>
+</tr>
+<tr>
+<td><code>ls [远程目录]</code></td>
+<td>列出远程目录文件</td>
+</tr>
+<tr>
+<td><code>cd 远程目录</code></td>
+<td>切换远程目录</td>
+</tr>
+<tr>
+<td><code>lcd 本地目录</code></td>
+<td>切换本地目录</td>
+</tr>
+<tr>
+<td><code>mkdir 目录名</code></td>
+<td>在远程创建目录</td>
+</tr>
+<tr>
+<td><code>rmdir 目录名</code></td>
+<td>删除远程空目录</td>
+</tr>
+<tr>
+<td><code>delete 文件名</code></td>
+<td>删除远程文件</td>
+</tr>
+<tr>
+<td><code>rename 旧名 新名</code></td>
+<td>重命名远程文件</td>
+</tr>
+<tr>
+<td><code>pwd</code></td>
+<td>显示当前远程目录</td>
+</tr>
+<tr>
+<td><code>bye/quit/exit</code></td>
+<td>退出 FTP 连接</td>
+</tr>
+</tbody></table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CentOS-7/" class="print-no-link">#CentOS 7</a>
+      
+        <a href="/tags/vsftpd/" class="print-no-link">#vsftpd</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CentOS 7搭建vsftpd服务器</div>
+      <div>https://netguy6.github.io/2025/10/06/CentOS 7搭建vsftpd服务器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>net06</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/10/06/CentOS%207%E6%90%AD%E5%BB%BAApache(httpd)%20web%20%E6%9C%8D%E5%8A%A1%E5%99%A8/" title="CentOS 7搭建Apache(httpd) web 服务器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CentOS 7搭建Apache(httpd) web 服务器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/10/03/Linux%E5%9F%BA%E7%A1%80/" title="Linux基础">
+                        <span class="hidden-mobile">Linux基础</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
