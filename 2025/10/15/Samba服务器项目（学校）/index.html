@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/pictogram.png">
+  <link rel="icon" href="/img/pictogram.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="net06">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Samba服务器项目实训（企业级文件共享与权限管理）3.1 实训目的 基于Samba服务实现 Linux与Linux、Linux与Windows主机 间的跨系统文件共享 模拟企业真实部门架构（系统组、开发组、测试组、产品组），实现精细化权限分配 掌握Samba服务的安装、配置、权限管控及客户端访问流程  3.2 前期准备3.2.1 环境清单   主机类型 IP地址 角色说明 核心任务    Lin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Samba服务器项目（学校）">
+<meta property="og:url" content="https://netguy6.github.io/2025/10/15/Samba%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%AD%A6%E6%A0%A1%EF%BC%89/index.html">
+<meta property="og:site_name" content="net06">
+<meta property="og:description" content="Samba服务器项目实训（企业级文件共享与权限管理）3.1 实训目的 基于Samba服务实现 Linux与Linux、Linux与Windows主机 间的跨系统文件共享 模拟企业真实部门架构（系统组、开发组、测试组、产品组），实现精细化权限分配 掌握Samba服务的安装、配置、权限管控及客户端访问流程  3.2 前期准备3.2.1 环境清单   主机类型 IP地址 角色说明 核心任务    Lin">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-15T09:18:04.000Z">
+<meta property="article:modified_time" content="2025-10-15T09:44:47.716Z">
+<meta property="article:author" content="net06">
+<meta property="article:tag" content="CentOS 7">
+<meta property="article:tag" content="Samba">
+<meta property="article:tag" content="学校作业">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Samba服务器项目（学校） - net06</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"netguy6.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>net06</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/business.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Samba服务器项目（学校）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-15 17:18" pubdate>
+          2025年10月15日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Samba服务器项目（学校）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Samba服务器项目实训（企业级文件共享与权限管理）"><a href="#Samba服务器项目实训（企业级文件共享与权限管理）" class="headerlink" title="Samba服务器项目实训（企业级文件共享与权限管理）"></a>Samba服务器项目实训（企业级文件共享与权限管理）</h1><h2 id="3-1-实训目的"><a href="#3-1-实训目的" class="headerlink" title="3.1 实训目的"></a>3.1 实训目的</h2><ol>
+<li>基于Samba服务实现 <strong>Linux与Linux、Linux与Windows主机</strong> 间的跨系统文件共享</li>
+<li>模拟企业真实部门架构（系统组、开发组、测试组、产品组），实现精细化权限分配</li>
+<li>掌握Samba服务的安装、配置、权限管控及客户端访问流程</li>
+</ol>
+<h2 id="3-2-前期准备"><a href="#3-2-前期准备" class="headerlink" title="3.2 前期准备"></a>3.2 前期准备</h2><h3 id="3-2-1-环境清单"><a href="#3-2-1-环境清单" class="headerlink" title="3.2.1 环境清单"></a>3.2.1 环境清单</h3><table>
+<thead>
+<tr>
+<th>主机类型</th>
+<th>IP地址</th>
+<th>角色说明</th>
+<th>核心任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linux服务器</td>
+<td>192.168.1.2&#x2F;24</td>
+<td>Samba服务端</td>
+<td>安装配置Samba、创建共享目录</td>
+</tr>
+<tr>
+<td>Linux客户端</td>
+<td>192.168.1.3&#x2F;24</td>
+<td>测试Linux端访问权限</td>
+<td>安装Samba客户端工具</td>
+</tr>
+<tr>
+<td>Windows客户端</td>
+<td>192.168.1.100&#x2F;24</td>
+<td>测试Windows端访问权限</td>
+<td>启用SMB功能、访问共享目录</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-2-基础要求"><a href="#3-2-2-基础要求" class="headerlink" title="3.2.2 基础要求"></a>3.2.2 基础要求</h3><ul>
+<li>所有主机处于同一局域网，通过<code>ping 目标IP</code>验证网络连通性（例：服务器ping客户端<code>ping 192.168.1.3</code>）</li>
+<li>Linux系统为CentOS 7，Windows系统为Win10（需管理员权限）</li>
+<li>服务器端需挂载CentOS 7安装光盘（用于本地YUM源配置）</li>
+</ul>
+<h2 id="3-3-服务器端配置（核心步骤）"><a href="#3-3-服务器端配置（核心步骤）" class="headerlink" title="3.3 服务器端配置（核心步骤）"></a>3.3 服务器端配置（核心步骤）</h2><h3 id="3-3-1-步骤1：配置本地YUM源并安装Samba"><a href="#3-3-1-步骤1：配置本地YUM源并安装Samba" class="headerlink" title="3.3.1 步骤1：配置本地YUM源并安装Samba"></a>3.3.1 步骤1：配置本地YUM源并安装Samba</h3><h4 id="1-挂载安装光盘"><a href="#1-挂载安装光盘" class="headerlink" title="1. 挂载安装光盘"></a>1. 挂载安装光盘</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建光盘挂载目录</span><br><span class="hljs-built_in">mkdir</span> /iso<br><span class="hljs-comment"># 挂载光盘到/iso目录（若/dev/cdrom不存在，可替换为/dev/sr0）</span><br>mount /dev/cdrom /iso<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-备份默认YUM源"><a href="#2-备份默认YUM源" class="headerlink" title="2. 备份默认YUM源"></a>2. 备份默认YUM源</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建YUM源备份目录，避免原有配置干扰</span><br><span class="hljs-built_in">mkdir</span> /etc/yum.repos.d/bak<br><span class="hljs-comment"># 将系统默认的.repo文件移动到备份目录</span><br><span class="hljs-built_in">mv</span> /etc/yum.repos.d/*.repo /etc/yum.repos.d/bak<br></code></pre></td></tr></table></figure>
+
+<h4 id="3-创建本地YUM源配置文件"><a href="#3-创建本地YUM源配置文件" class="headerlink" title="3. 创建本地YUM源配置文件"></a>3. 创建本地YUM源配置文件</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 用vim编辑dvd.repo配置文件</span><br>vim /etc/yum.repos.d/dvd.repo<br></code></pre></td></tr></table></figure>
+<p>在vim编辑器中输入以下内容（按<code>ESC</code>后输入<code>:wq</code>保存退出）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[dvd]</span><br><span class="hljs-attr">name</span>=dvd  <span class="hljs-comment"># YUM源名称（自定义）</span><br><span class="hljs-attr">baseurl</span>=file:///iso  <span class="hljs-comment"># 本地挂载路径</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-number">0</span>  <span class="hljs-comment"># 关闭GPG校验（本地源无需校验）</span><br><span class="hljs-attr">enabled</span>=<span class="hljs-number">1</span>  <span class="hljs-comment"># 启用该YUM源（默认1，可省略）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="4-安装Samba服务"><a href="#4-安装Samba服务" class="headerlink" title="4. 安装Samba服务"></a>4. 安装Samba服务</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 清除YUM缓存（避免旧缓存影响安装）</span><br>yum clean all<br><span class="hljs-comment"># 安装Samba主服务包（-y自动确认）</span><br>yum install samba -y<br><span class="hljs-comment"># 验证安装结果（查看已安装的Samba相关包）</span><br>rpm -qa | grep samba<br></code></pre></td></tr></table></figure>
+<p><strong>安装成功标志</strong>：输出包含<code>samba-4.6.2-8.el7.x86_64</code>、<code>samba-libs-4.6.2-8.el7.x86_64</code>等包。</p>
+<h3 id="3-3-2-步骤2：启动Samba服务并配置防火墙-SELinux"><a href="#3-3-2-步骤2：启动Samba服务并配置防火墙-SELinux" class="headerlink" title="3.3.2 步骤2：启动Samba服务并配置防火墙&#x2F;SELinux"></a>3.3.2 步骤2：启动Samba服务并配置防火墙&#x2F;SELinux</h3><h4 id="1-启动并设置Samba开机自启"><a href="#1-启动并设置Samba开机自启" class="headerlink" title="1. 启动并设置Samba开机自启"></a>1. 启动并设置Samba开机自启</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动Samba主服务（SMB协议核心）</span><br>systemctl start smb<br><span class="hljs-comment"># 设置开机自启（避免重启后服务失效）</span><br>systemctl <span class="hljs-built_in">enable</span> smb<br><span class="hljs-comment"># 重启Samba服务（确保配置生效）</span><br>systemctl restart smb<br><span class="hljs-comment"># 查看服务状态（确认Active: active (running)）</span><br>systemctl status smb<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-配置防火墙允许Samba服务"><a href="#2-配置防火墙允许Samba服务" class="headerlink" title="2. 配置防火墙允许Samba服务"></a>2. 配置防火墙允许Samba服务</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 永久允许Samba服务通过防火墙（--permanent表示重启后生效）</span><br>firewall-cmd --permanent --add-service=samba<br><span class="hljs-comment"># 重新加载防火墙规则（使永久配置生效）</span><br>firewall-cmd --reload<br></code></pre></td></tr></table></figure>
+
+<h4 id="3-临时关闭SELinux（避免权限拦截）"><a href="#3-临时关闭SELinux（避免权限拦截）" class="headerlink" title="3. 临时关闭SELinux（避免权限拦截）"></a>3. 临时关闭SELinux（避免权限拦截）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 临时设置SELinux为宽容模式（重启后失效，适合测试环境）</span><br>setenforce permissive<br><span class="hljs-comment"># 验证SELinux状态（输出Permissive即为成功）</span><br>getenforce<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="3-3-3-步骤3：创建共享目录与部门架构"><a href="#3-3-3-步骤3：创建共享目录与部门架构" class="headerlink" title="3.3.3 步骤3：创建共享目录与部门架构"></a>3.3.3 步骤3：创建共享目录与部门架构</h3><h4 id="1-创建共享目录结构"><a href="#1-创建共享目录结构" class="headerlink" title="1. 创建共享目录结构"></a>1. 创建共享目录结构</h4><p>（两种方法可选，推荐方法二便于检查）</p>
+<p><strong>方法一：直接创建多级目录</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># -p：若父目录/share不存在则自动创建</span><br><span class="hljs-built_in">mkdir</span> -p /share/&#123;system,develop,<span class="hljs-built_in">test</span>,product,developandtest,public,ziliaoku&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>方法二：分步创建（适合新手）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建根共享目录</span><br><span class="hljs-built_in">mkdir</span> /share<br><span class="hljs-comment"># 进入根共享目录</span><br><span class="hljs-built_in">cd</span> /share<br><span class="hljs-comment"># 逐一创建部门子目录</span><br><span class="hljs-built_in">mkdir</span> system      <span class="hljs-comment"># 系统组目录</span><br><span class="hljs-built_in">mkdir</span> develop     <span class="hljs-comment"># 开发组目录</span><br><span class="hljs-built_in">mkdir</span> <span class="hljs-built_in">test</span>        <span class="hljs-comment"># 测试组目录</span><br><span class="hljs-built_in">mkdir</span> product     <span class="hljs-comment"># 产品组目录</span><br><span class="hljs-built_in">mkdir</span> developandtest  <span class="hljs-comment"># 开发+测试共享目录</span><br><span class="hljs-built_in">mkdir</span> public      <span class="hljs-comment"># 临时共享目录（全员可写）</span><br><span class="hljs-built_in">mkdir</span> ziliaoku    <span class="hljs-comment"># 资料库目录（全员只读）</span><br><span class="hljs-comment"># 查看目录结构（验证创建结果）</span><br>ll /share<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="3-3-4-步骤4：创建部门群组与用户"><a href="#3-3-4-步骤4：创建部门群组与用户" class="headerlink" title="3.3.4 步骤4：创建部门群组与用户"></a>3.3.4 步骤4：创建部门群组与用户</h3><h4 id="1-创建部门群组（系统级）"><a href="#1-创建部门群组（系统级）" class="headerlink" title="1. 创建部门群组（系统级）"></a>1. 创建部门群组（系统级）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建4个部门群组，与目录名对应</span><br>groupadd system    <span class="hljs-comment"># 系统组</span><br>groupadd develop   <span class="hljs-comment"># 开发组</span><br>groupadd <span class="hljs-built_in">test</span>      <span class="hljs-comment"># 测试组</span><br>groupadd product   <span class="hljs-comment"># 产品组</span><br><span class="hljs-comment"># 验证群组（查看/etc/group文件）</span><br><span class="hljs-built_in">cat</span> /etc/group | grep -E <span class="hljs-string">&quot;system|develop|test|product&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-创建用户并分配到对应群组"><a href="#2-创建用户并分配到对应群组" class="headerlink" title="2. 创建用户并分配到对应群组"></a>2. 创建用户并分配到对应群组</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建用户user1，附加组为system（系统组）</span><br>useradd -G system user1<br><span class="hljs-comment"># 创建用户user2，附加组为develop（开发组）</span><br>useradd -G develop user2<br><span class="hljs-comment"># 创建用户user3，附加组为test（测试组）</span><br>useradd -G <span class="hljs-built_in">test</span> user3<br><span class="hljs-comment"># 创建用户user4，附加组为product（产品组）</span><br>useradd -G product user4<br><span class="hljs-comment"># 验证用户所属组（例：查看user2的群组）</span><br><span class="hljs-built_in">groups</span> user2<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="3-3-5-步骤5：设置目录权限（核心：用户-组-目录关联）"><a href="#3-3-5-步骤5：设置目录权限（核心：用户-组-目录关联）" class="headerlink" title="3.3.5 步骤5：设置目录权限（核心：用户-组-目录关联）"></a>3.3.5 步骤5：设置目录权限（核心：用户-组-目录关联）</h3><h4 id="1-更改目录所有者与所属组"><a href="#1-更改目录所有者与所属组" class="headerlink" title="1. 更改目录所有者与所属组"></a>1. 更改目录所有者与所属组</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># /share/system：所有者user1，所属组system</span><br><span class="hljs-built_in">chown</span> user1:system /share/system<br><span class="hljs-comment"># /share/develop：所有者user2，所属组develop</span><br><span class="hljs-built_in">chown</span> user2:develop /share/develop<br><span class="hljs-comment"># /share/test：所有者user3，所属组test</span><br><span class="hljs-built_in">chown</span> user3:<span class="hljs-built_in">test</span> /share/test<br><span class="hljs-comment"># /share/product：所有者user4，所属组product</span><br><span class="hljs-built_in">chown</span> user4:product /share/product<br><span class="hljs-comment"># 验证权限（查看所有者和所属组）</span><br>ll /share<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-设置目录权限（基于Linux权限位）"><a href="#2-设置目录权限（基于Linux权限位）" class="headerlink" title="2. 设置目录权限（基于Linux权限位）"></a>2. 设置目录权限（基于Linux权限位）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 基础权限：/share下所有子目录默认770（所有者+所属组可读写执行，其他无权限）</span><br><span class="hljs-built_in">chmod</span> 770 /share/*<br><span class="hljs-comment"># 2. 特殊目录权限调整：</span><br><span class="hljs-built_in">chmod</span> 444 /share/ziliaoku  <span class="hljs-comment"># 资料库：全员只读（r--r--r--）</span><br><span class="hljs-built_in">chmod</span> 777 /share/public    <span class="hljs-comment"># 临时目录：全员可读写执行（rwxrwxrwx）</span><br><span class="hljs-built_in">chmod</span> 770 /share/developandtest  <span class="hljs-comment"># 开发+测试共享：仅两组用户可操作</span><br><span class="hljs-comment"># 验证最终权限</span><br>ll /share<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>权限值</th>
+<th>权限符号</th>
+<th>含义（所有者-所属组-其他）</th>
+<th>适用目录</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>770</td>
+<td>rwxrwx—</td>
+<td>读写执行-读写执行-无权限</td>
+<td>system&#x2F;develop&#x2F;test&#x2F;product&#x2F;developandtest</td>
+</tr>
+<tr>
+<td>777</td>
+<td>rwxrwxrwx</td>
+<td>读写执行-读写执行-读写执行</td>
+<td>public</td>
+</tr>
+<tr>
+<td>444</td>
+<td>r–r–r–</td>
+<td>只读-只读-只读</td>
+<td>ziliaoku</td>
+</tr>
+</tbody></table>
+<h3 id="3-3-6-步骤6：配置Samba共享（smb-conf）"><a href="#3-3-6-步骤6：配置Samba共享（smb-conf）" class="headerlink" title="3.3.6 步骤6：配置Samba共享（smb.conf）"></a>3.3.6 步骤6：配置Samba共享（smb.conf）</h3><h4 id="1-编辑Samba主配置文件"><a href="#1-编辑Samba主配置文件" class="headerlink" title="1. 编辑Samba主配置文件"></a>1. 编辑Samba主配置文件</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 备份原配置文件（避免改错无法恢复）</span><br><span class="hljs-built_in">cp</span> /etc/samba/smb.conf /etc/samba/smb.conf.bak<br><span class="hljs-comment"># 编辑主配置文件</span><br>vim /etc/samba/smb.conf<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-添加共享配置段"><a href="#2-添加共享配置段" class="headerlink" title="2. 添加共享配置段"></a>2. 添加共享配置段</h4><p>在文件末尾添加<code>[share]</code>段（对应根共享目录），内容如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[share]</span><br><span class="hljs-attr">comment</span> = Enterprise File Share  <span class="hljs-comment"># 共享描述（自定义）</span><br><span class="hljs-attr">path</span> = /share                   <span class="hljs-comment"># 共享目录的绝对路径</span><br><span class="hljs-attr">writable</span> = <span class="hljs-literal">yes</span>                  <span class="hljs-comment"># 允许写入（需结合Linux权限生效）</span><br><span class="hljs-attr">public</span> = <span class="hljs-literal">yes</span>                    <span class="hljs-comment"># 允许匿名访问（但实际权限由Linux+Samba用户控制）</span><br><span class="hljs-attr">browseable</span> = <span class="hljs-literal">yes</span>                <span class="hljs-comment"># 允许在客户端浏览共享目录（默认yes）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-重启Samba服务使配置生效"><a href="#3-重启Samba服务使配置生效" class="headerlink" title="3. 重启Samba服务使配置生效"></a>3. 重启Samba服务使配置生效</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl restart smb<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="3-3-7-步骤7：添加Samba用户（关键：系统用户→Samba用户）"><a href="#3-3-7-步骤7：添加Samba用户（关键：系统用户→Samba用户）" class="headerlink" title="3.3.7 步骤7：添加Samba用户（关键：系统用户→Samba用户）"></a>3.3.7 步骤7：添加Samba用户（关键：系统用户→Samba用户）</h3><p>Samba用户需基于已创建的系统用户（如user1-user4），统一密码设为<code>123456</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 添加user1为Samba用户（按提示输入密码123456，输入时隐藏）</span><br>smbpasswd -a user1<br><span class="hljs-comment"># 添加user2为Samba用户</span><br>smbpasswd -a user2<br><span class="hljs-comment"># 添加user3为Samba用户</span><br>smbpasswd -a user3<br><span class="hljs-comment"># 添加user4为Samba用户</span><br>smbpasswd -a user4<br><span class="hljs-comment"># 验证Samba用户列表</span><br>pdbedit -L<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="3-4-客户端测试（Windows-Linux）"><a href="#3-4-客户端测试（Windows-Linux）" class="headerlink" title="3.4 客户端测试（Windows+Linux）"></a>3.4 客户端测试（Windows+Linux）</h2><h3 id="3-4-1-Windows客户端测试（Win10）"><a href="#3-4-1-Windows客户端测试（Win10）" class="headerlink" title="3.4.1 Windows客户端测试（Win10）"></a>3.4.1 Windows客户端测试（Win10）</h3><h4 id="1-启用SMB功能"><a href="#1-启用SMB功能" class="headerlink" title="1. 启用SMB功能"></a>1. 启用SMB功能</h4><ol>
+<li>打开「控制面板」→「程序」→「程序和功能」→「启用或关闭Windows功能」</li>
+<li>勾选以下选项：<ul>
+<li>SMB 1.0&#x2F;CIFS 文件共享支持（含服务器、客户端）</li>
+<li>SMB 直通</li>
+</ul>
+</li>
+<li>点击「确定」，等待功能安装完成（无需重启）</li>
+</ol>
+<h4 id="2-访问Samba共享"><a href="#2-访问Samba共享" class="headerlink" title="2. 访问Samba共享"></a>2. 访问Samba共享</h4><ol>
+<li>按<code>Win+R</code>打开「运行」，输入共享地址：<code>\\192.168.1.2</code>（服务器IP）</li>
+<li>弹出「输入网络凭据」，输入：<ul>
+<li>用户名：<code>user2</code>（开发组用户，测试develop目录权限）</li>
+<li>密码：<code>123456</code></li>
+</ul>
+</li>
+<li>点击「确定」，进入共享目录<code>share</code></li>
+</ol>
+<h4 id="3-权限验证（以user2为例）"><a href="#3-权限验证（以user2为例）" class="headerlink" title="3. 权限验证（以user2为例）"></a>3. 权限验证（以user2为例）</h4><table>
+<thead>
+<tr>
+<th>测试场景</th>
+<th>预期结果</th>
+<th>实际现象验证</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>访问<code>develop</code>目录</td>
+<td>可进入，可创建&#x2F;删除文件（770权限）</td>
+<td>右键新建文件夹（如“one”），创建成功</td>
+</tr>
+<tr>
+<td>访问<code>system</code>目录</td>
+<td>拒绝访问（system组专属，user2不属于该组）</td>
+<td>弹出“你没有权限访问\192.168.1.2\share\system”</td>
+</tr>
+<tr>
+<td>访问<code>ziliaoku</code>目录</td>
+<td>可进入但无法创建文件（444只读权限）</td>
+<td>右键新建文件夹，提示“目标文件夹访问被拒绝”</td>
+</tr>
+<tr>
+<td>访问<code>public</code>目录</td>
+<td>可进入，可创建文件（777全员可写）</td>
+<td>新建文件夹成功</td>
+</tr>
+</tbody></table>
+<h3 id="3-4-2-Linux客户端测试"><a href="#3-4-2-Linux客户端测试" class="headerlink" title="3.4.2 Linux客户端测试"></a>3.4.2 Linux客户端测试</h3><h4 id="1-客户端环境配置（安装Samba工具）"><a href="#1-客户端环境配置（安装Samba工具）" class="headerlink" title="1. 客户端环境配置（安装Samba工具）"></a>1. 客户端环境配置（安装Samba工具）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 同服务器端，先配置本地YUM源（步骤参考3.3.1）</span><br><span class="hljs-comment"># 安装Samba客户端和CIFS工具</span><br>yum install samba-client cifs-utils -y<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-访问Samba共享-1"><a href="#2-访问Samba共享-1" class="headerlink" title="2. 访问Samba共享"></a>2. 访问Samba共享</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 用smbclient连接共享目录，指定用户user2</span><br>smbclient //192.168.1.2/share -U user2<br><span class="hljs-comment"># 输入密码123456，进入smb命令行（提示smb:\&gt;）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-权限验证（smb命令行操作）"><a href="#3-权限验证（smb命令行操作）" class="headerlink" title="3. 权限验证（smb命令行操作）"></a>3. 权限验证（smb命令行操作）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 查看共享目录结构</span><br>smb:\&gt; <span class="hljs-built_in">ls</span><br><span class="hljs-comment"># 2. 进入develop目录</span><br>smb:\&gt; <span class="hljs-built_in">cd</span> develop<br><span class="hljs-comment"># 3. 创建测试文件夹“one”（验证写入权限）</span><br>smb:\&gt; <span class="hljs-built_in">mkdir</span> one<br><span class="hljs-comment"># 4. 查看创建结果（成功显示“one”文件夹）</span><br>smb:\&gt; <span class="hljs-built_in">ls</span><br><span class="hljs-comment"># 5. 回到上一级目录，进入ziliaoku</span><br>smb:\&gt; <span class="hljs-built_in">cd</span> ../ziliaoku<br><span class="hljs-comment"># 6. 尝试创建文件夹“one”（验证只读权限）</span><br>smb:\&gt; <span class="hljs-built_in">mkdir</span> one<br><span class="hljs-comment"># 预期结果：NT_STATUS_ACCESS_DENIED（权限拒绝）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="4-退出smb命令行"><a href="#4-退出smb命令行" class="headerlink" title="4. 退出smb命令行"></a>4. 退出smb命令行</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">smb:\&gt; <span class="hljs-built_in">exit</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="3-5-实训总结（权限架构梳理）"><a href="#3-5-实训总结（权限架构梳理）" class="headerlink" title="3.5 实训总结（权限架构梳理）"></a>3.5 实训总结（权限架构梳理）</h2><h3 id="3-5-1-权限关系图（Mermaid）"><a href="#3-5-1-权限关系图（Mermaid）" class="headerlink" title="3.5.1 权限关系图（Mermaid）"></a>3.5.1 权限关系图（Mermaid）</h3><pre><code class=" mermaid">graph TD
+    A[Share根目录（/share）- 770] --&gt; B[system目录-770]
+    A --&gt; C[develop目录-770]
+    A --&gt; D[test目录-770]
+    A --&gt; E[product目录-770]
+    A --&gt; F[developandtest目录-770]
+    A --&gt; G[public目录-777]
+    A --&gt; H[ziliaoku目录-444]
+    
+    B --&gt; I[所属组：system]
+    C --&gt; J[所属组：develop]
+    D --&gt; K[所属组：test]
+    E --&gt; L[所属组：product]
+    
+    I --&gt; M[用户：user1（密码123456）]
+    J --&gt; N[用户：user2（密码123456）]
+    K --&gt; O[用户：user3（密码123456）]
+    L --&gt; P[用户：user4（密码123456）]
+</code></pre>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CentOS-7/" class="print-no-link">#CentOS 7</a>
+      
+        <a href="/tags/Samba/" class="print-no-link">#Samba</a>
+      
+        <a href="/tags/%E5%AD%A6%E6%A0%A1%E4%BD%9C%E4%B8%9A/" class="print-no-link">#学校作业</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Samba服务器项目（学校）</div>
+      <div>https://netguy6.github.io/2025/10/15/Samba服务器项目（学校）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>net06</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/10/15/CentOS7%20%E6%90%AD%E5%BB%BASamba%E6%9C%8D%E5%8A%A1%E5%99%A8/" title="CentOS7 搭建Samba服务器">
+                        <span class="hidden-mobile">CentOS7 搭建Samba服务器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
