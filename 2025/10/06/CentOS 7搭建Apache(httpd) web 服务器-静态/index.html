@@ -21,13 +21,13 @@
   
     <meta name="description" content="一、Apache 概述Apache 核心特性 跨平台：支持 Linux、Windows、BSD 等，CentOS 7 中默认以 httpd 服务运行； 虚拟主机：支持基于域名、IP、端口的多站点部署，一台服务器可托管多个网站； 模块扩展：通过动态模块（如 mod_rewrite 重写、mod_ssl 加密）扩展功能； 安全稳定：运行于低权限 apache 用户，支持 SELinux 权限控制，减少">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CentOS 7搭建Apache(httpd) web 服务器">
-<meta property="og:url" content="https://netguy6.github.io/2025/10/06/CentOS%207%E6%90%AD%E5%BB%BAApache(httpd)%20web%20%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html">
+<meta property="og:title" content="CentOS 7搭建Apache(httpd) web 服务器-静态">
+<meta property="og:url" content="https://netguy6.github.io/2025/10/06/CentOS%207%E6%90%AD%E5%BB%BAApache(httpd)%20web%20%E6%9C%8D%E5%8A%A1%E5%99%A8-%E9%9D%99%E6%80%81/index.html">
 <meta property="og:site_name" content="net06">
 <meta property="og:description" content="一、Apache 概述Apache 核心特性 跨平台：支持 Linux、Windows、BSD 等，CentOS 7 中默认以 httpd 服务运行； 虚拟主机：支持基于域名、IP、端口的多站点部署，一台服务器可托管多个网站； 模块扩展：通过动态模块（如 mod_rewrite 重写、mod_ssl 加密）扩展功能； 安全稳定：运行于低权限 apache 用户，支持 SELinux 权限控制，减少">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-06T09:20:09.580Z">
-<meta property="article:modified_time" content="2025-10-06T11:56:45.970Z">
+<meta property="article:modified_time" content="2025-10-29T12:16:57.675Z">
 <meta property="article:author" content="net06">
 <meta property="article:tag" content="CentOS 7">
 <meta property="article:tag" content="Apache(httpd)">
@@ -35,7 +35,7 @@
   
   
   
-  <title>CentOS 7搭建Apache(httpd) web 服务器 - net06</title>
+  <title>CentOS 7搭建Apache(httpd) web 服务器-静态 - net06</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CentOS 7搭建Apache(httpd) web 服务器"></span>
+            <span id="subtitle" data-typed-text="CentOS 7搭建Apache(httpd) web 服务器-静态"></span>
           
         </div>
 
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.7k 字
+          6.2k 字
         
       </span>
     
@@ -235,7 +235,7 @@
         
         
         
-          56 分钟
+          52 分钟
         
       </span>
     
@@ -272,7 +272,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CentOS 7搭建Apache(httpd) web 服务器</h1>
+            <h1 id="seo-header">CentOS 7搭建Apache(httpd) web 服务器-静态</h1>
             
             
               <div class="markdown-body">
@@ -481,25 +481,7 @@
 <p>或者明确指定：</p>
 <figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-section">&lt;VirtualHost *<span class="hljs-number">:80</span>&gt;</span><br>    <span class="hljs-attribute">ServerName</span> default<br>    <span class="hljs-attribute">DocumentRoot</span> <span class="hljs-string">&quot;/var/www/default&quot;</span><br>    <span class="hljs-comment"># 这个会处理所有未匹配到其他虚拟主机的请求</span><br><span class="hljs-section">&lt;/VirtualHost&gt;</span><br></code></pre></td></tr></table></figure>
 
-
-<h2 id="七、动态站点配置（PHP-MariaDB-集成）"><a href="#七、动态站点配置（PHP-MariaDB-集成）" class="headerlink" title="七、动态站点配置（PHP + MariaDB 集成）"></a>七、动态站点配置（PHP + MariaDB 集成）</h2><p>静态站点仅支持 HTML&#x2F;CSS&#x2F;JS，若需运行动态页面（如 PHP 脚本），需集成 PHP 和数据库（MariaDB，MySQL 的分支），实现 LAMP（Linux + Apache + MariaDB + PHP）环境。</p>
-<h3 id="1-安装-PHP-及依赖"><a href="#1-安装-PHP-及依赖" class="headerlink" title="1. 安装 PHP 及依赖"></a>1. 安装 PHP 及依赖</h3><p>CentOS 7 默认提供 PHP 5.4，若需更高版本（如 PHP 7.4）需额外添加 EPEL 仓库，此处先以默认版本为例：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 安装 PHP 及 Apache PHP 模块（mod_php）</span><br><span class="hljs-built_in">sudo</span> yum install -y php php-mysql  <span class="hljs-comment"># php-mysql：PHP 连接 MariaDB 的模块</span><br><br><span class="hljs-comment"># 2. 重启 Apache（加载 mod_php 模块）</span><br><span class="hljs-built_in">sudo</span> systemctl restart httpd<br></code></pre></td></tr></table></figure>
-
-<h3 id="2-测试-PHP-功能"><a href="#2-测试-PHP-功能" class="headerlink" title="2. 测试 PHP 功能"></a>2. 测试 PHP 功能</h3><p>创建 PHP 测试页面，验证 Apache 是否能解析 PHP 脚本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 在 example.com 站点目录创建 info.php</span><br><span class="hljs-built_in">sudo</span> vi /var/www/example.com/html/info.php<br></code></pre></td></tr></table></figure>
-<p>添加以下内容：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-comment">// 输出 PHP 环境信息（测试用，生产环境需删除）</span><br><span class="hljs-title function_ invoke__">phpinfo</span>();<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
-<p>访问 <code>http://www.example.com/info.php</code>，若显示 PHP 版本、模块、配置等信息，说明 PHP 解析正常。</p>
-<h3 id="3-安装-MariaDB-并配置"><a href="#3-安装-MariaDB-并配置" class="headerlink" title="3. 安装 MariaDB 并配置"></a>3. 安装 MariaDB 并配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 安装 MariaDB 服务器和客户端</span><br><span class="hljs-built_in">sudo</span> yum install -y mariadb-server mariadb<br><br><span class="hljs-comment"># 2. 启动 MariaDB 并设置开机自启</span><br><span class="hljs-built_in">sudo</span> systemctl start mariadb<br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> mariadb<br><br><span class="hljs-comment"># 3. 初始化 MariaDB（设置 root 密码、删除匿名用户、禁止远程 root 登录）</span><br><span class="hljs-built_in">sudo</span> mysql_secure_installation<br><span class="hljs-comment"># 按提示操作：</span><br><span class="hljs-comment"># - 输入当前 root 密码（默认空，直接回车）</span><br><span class="hljs-comment"># - 输入新密码（如 mariadb123）</span><br><span class="hljs-comment"># - 确认密码</span><br><span class="hljs-comment"># - 后续全部输入 Y（删除匿名用户、禁止远程 root、删除测试数据库、刷新权限）</span><br></code></pre></td></tr></table></figure>
-
-<h3 id="4-测试-PHP-连接-MariaDB"><a href="#4-测试-PHP-连接-MariaDB" class="headerlink" title="4. 测试 PHP 连接 MariaDB"></a>4. 测试 PHP 连接 MariaDB</h3><p>创建 PHP 脚本，验证能否连接数据库：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> vi /var/www/example.com/html/db_test.php<br></code></pre></td></tr></table></figure>
-<p>添加以下内容（替换 <code>DB_PASSWORD</code> 为你的 MariaDB root 密码）：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-comment">// 数据库连接信息</span><br><span class="hljs-variable">$servername</span> = <span class="hljs-string">&quot;localhost&quot;</span>;<br><span class="hljs-variable">$username</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$password</span> = <span class="hljs-string">&quot;DB_PASSWORD&quot;</span>;  <span class="hljs-comment">// 替换为你的 MariaDB root 密码</span><br><br><span class="hljs-comment">// 创建连接</span><br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> <span class="hljs-title function_ invoke__">mysqli</span>(<span class="hljs-variable">$servername</span>, <span class="hljs-variable">$username</span>, <span class="hljs-variable">$password</span>);<br><br><span class="hljs-comment">// 检查连接</span><br><span class="hljs-keyword">if</span> (<span class="hljs-variable">$conn</span>-&gt;connect_error) &#123;<br>    <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;连接失败: &quot;</span> . <span class="hljs-variable">$conn</span>-&gt;connect_error);<br>&#125;<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;PHP 连接 MariaDB 成功！&quot;</span>;<br><br><span class="hljs-comment">// 关闭连接</span><br><span class="hljs-variable">$conn</span>-&gt;<span class="hljs-title function_ invoke__">close</span>();<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
-<p>访问 <code>http://www.example.com/db_test.php</code>，若显示“PHP 连接 MariaDB 成功！”，说明动态环境配置完成。</p>
-<p>好的，我来补充Apache的认证配置内容。这是保护网站目录或API接口的常用方法。</p>
-<h2 id="八、Apache认证配置"><a href="#八、Apache认证配置" class="headerlink" title="八、Apache认证配置"></a>八、Apache认证配置</h2><p>Apache支持多种认证方式，包括基本认证（Basic Authentication）和摘要认证（Digest Authentication），用于保护特定目录或文件的访问。</p>
+<h2 id="七、Apache认证配置"><a href="#七、Apache认证配置" class="headerlink" title="七、Apache认证配置"></a>七、Apache认证配置</h2><p>Apache支持多种认证方式，包括基本认证（Basic Authentication）和摘要认证（Digest Authentication），用于保护特定目录或文件的访问。</p>
 <h3 id="1-基本认证（Basic-Authentication）配置"><a href="#1-基本认证（Basic-Authentication）配置" class="headerlink" title="1. 基本认证（Basic Authentication）配置"></a>1. 基本认证（Basic Authentication）配置</h3><p>基本认证是最常用的认证方式，浏览器会弹出用户名&#x2F;密码输入框。</p>
 <h4 id="（1）创建密码文件"><a href="#（1）创建密码文件" class="headerlink" title="（1）创建密码文件"></a>（1）创建密码文件</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建认证目录（建议放在/etc/httpd/目录下）</span><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> -p /etc/httpd/auth<br><br><span class="hljs-comment"># 创建密码文件并添加第一个用户（-c 选项创建新文件）</span><br><span class="hljs-built_in">sudo</span> htpasswd -c /etc/httpd/auth/.htpasswd user1<br><span class="hljs-comment"># 按提示输入密码</span><br><br><span class="hljs-comment"># 添加第二个用户（不使用 -c 选项，避免覆盖）</span><br><span class="hljs-built_in">sudo</span> htpasswd /etc/httpd/auth/.htpasswd user2<br><br><span class="hljs-comment"># 查看密码文件内容</span><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cat</span> /etc/httpd/auth/.htpasswd<br><span class="hljs-comment"># 输出示例：user1:$apr1$xxxxxxxx$yyyyyyyyyyyyyyyyyyyyyy</span><br><span class="hljs-comment">#         user2:$apr1$zzzzzzzz$wwwwwwwwwwwwwwwwwwwwww</span><br></code></pre></td></tr></table></figure>
 
@@ -569,7 +551,7 @@
 <h4 id="（3）SELinux问题"><a href="#（3）SELinux问题" class="headerlink" title="（3）SELinux问题"></a>（3）SELinux问题</h4><p>如果认证目录在非标准位置，可能需要设置SELinux上下文：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> semanage fcontext -a -t httpd_sys_content_t <span class="hljs-string">&quot;/custom/auth/path(/.*)?&quot;</span><br><span class="hljs-built_in">sudo</span> restorecon -Rv /custom/auth/path<br></code></pre></td></tr></table></figure>
 
-<h2 id="九、常见问题与解决方案"><a href="#九、常见问题与解决方案" class="headerlink" title="九、常见问题与解决方案"></a>九、常见问题与解决方案</h2><h3 id="1-Apache-启动失败：Job-for-httpd-service-failed"><a href="#1-Apache-启动失败：Job-for-httpd-service-failed" class="headerlink" title="1. Apache 启动失败：Job for httpd.service failed"></a>1. Apache 启动失败：<code>Job for httpd.service failed</code></h3><ul>
+<h2 id="八、常见问题与解决方案"><a href="#八、常见问题与解决方案" class="headerlink" title="八、常见问题与解决方案"></a>八、常见问题与解决方案</h2><h3 id="1-Apache-启动失败：Job-for-httpd-service-failed"><a href="#1-Apache-启动失败：Job-for-httpd-service-failed" class="headerlink" title="1. Apache 启动失败：Job for httpd.service failed"></a>1. Apache 启动失败：<code>Job for httpd.service failed</code></h3><ul>
 <li><strong>原因 1</strong>：配置文件语法错误；<br><strong>解决</strong>：执行 <code>sudo apachectl configtest</code> 查看错误位置（如行号、指令拼写错误），修改后重试。</li>
 <li><strong>原因 2</strong>：80 端口被占用（如 Nginx 服务）；<br><strong>解决</strong>：查找占用进程 <code>sudo ss -tulpn | grep :80</code>，停止占用服务（如 <code>sudo systemctl stop nginx</code>）。</li>
 <li><strong>原因 3</strong>：SELinux 拦截目录访问；<br><strong>解决</strong>：按步骤五设置目录的 SELinux 上下文（如 <code>httpd_log_t</code> 用于日志目录）。</li>
@@ -628,8 +610,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CentOS 7搭建Apache(httpd) web 服务器</div>
-      <div>https://netguy6.github.io/2025/10/06/CentOS 7搭建Apache(httpd) web 服务器/</div>
+      <div>CentOS 7搭建Apache(httpd) web 服务器-静态</div>
+      <div>https://netguy6.github.io/2025/10/06/CentOS 7搭建Apache(httpd) web 服务器-静态/</div>
     </div>
     <div class="license-meta">
       
@@ -802,7 +784,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
     </div>
   
   
