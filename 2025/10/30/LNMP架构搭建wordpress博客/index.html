@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/pictogram.png">
+  <link rel="icon" href="/img/pictogram.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="net06">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一、环境概述 架构组成：Linux（CentOS7）+ Nginx（Web 服务器）+ MariaDB（MySQL 兼容数据库）+ PHP（PHP-FPM 进程管理）  核心优势：轻量高效、并发处理能力强，适合中小型网站、博客、企业官网等场景  适配场景：生产环境、测试环境、高并发静态资源服务（动态内容需配合 PHP-FPM）  组件版本参考（默认 &#x2F; 推荐）：      组件 系统默认">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LNMP架构搭建wordpress博客">
+<meta property="og:url" content="https://netguy6.github.io/2025/10/30/LNMP%E6%9E%B6%E6%9E%84%E6%90%AD%E5%BB%BAwordpress%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:site_name" content="net06">
+<meta property="og:description" content="一、环境概述 架构组成：Linux（CentOS7）+ Nginx（Web 服务器）+ MariaDB（MySQL 兼容数据库）+ PHP（PHP-FPM 进程管理）  核心优势：轻量高效、并发处理能力强，适合中小型网站、博客、企业官网等场景  适配场景：生产环境、测试环境、高并发静态资源服务（动态内容需配合 PHP-FPM）  组件版本参考（默认 &#x2F; 推荐）：      组件 系统默认">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-30T03:26:17.000Z">
+<meta property="article:modified_time" content="2025-11-01T04:52:48.000Z">
+<meta property="article:author" content="net06">
+<meta property="article:tag" content="CentOS 7">
+<meta property="article:tag" content="LNMP">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>LNMP架构搭建wordpress博客 - net06</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"netguy6.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>net06</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/business.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LNMP架构搭建wordpress博客"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-30 11:26" pubdate>
+          2025年10月30日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LNMP架构搭建wordpress博客</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="一、环境概述"><a href="#一、环境概述" class="headerlink" title="一、环境概述"></a>一、环境概述</h2><ul>
+<li><p><strong>架构组成</strong>：Linux（CentOS7）+ Nginx（Web 服务器）+ MariaDB（MySQL 兼容数据库）+ PHP（PHP-FPM 进程管理）</p>
+</li>
+<li><p><strong>核心优势</strong>：轻量高效、并发处理能力强，适合中小型网站、博客、企业官网等场景</p>
+</li>
+<li><p><strong>适配场景</strong>：生产环境、测试环境、高并发静态资源服务（动态内容需配合 PHP-FPM）</p>
+</li>
+<li><p><strong>组件版本参考</strong>（默认 &#x2F; 推荐）：</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>系统默认版本</th>
+<th>推荐版本</th>
+<th>安装方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Nginx</td>
+<td>1.12.x</td>
+<td>1.20.x+</td>
+<td>YUM（EPEL 源）&#x2F; 源码编译</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td>5.5.x</td>
+<td>10.11.x</td>
+<td>YUM &#x2F; 官方镜像源</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>5.4.x</td>
+<td>7.4.x&#x2F;8.3.x</td>
+<td>YUM（Remi 源）</td>
+</tr>
+<tr>
+<td>PHP-FPM</td>
+<td>随 PHP 配套</td>
+<td>与 PHP 版本一致</td>
+<td>随 PHP 安装</td>
+</tr>
+</tbody></table>
+<h2 id="二、前置准备"><a href="#二、前置准备" class="headerlink" title="二、前置准备"></a>二、前置准备</h2><h3 id="1-系统初始化"><a href="#1-系统初始化" class="headerlink" title="1. 系统初始化"></a>1. 系统初始化</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 备份并替换阿里云镜像源（加速安装，避免官方源卡顿）</span><br><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mv</span> /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup<br><br><span class="hljs-built_in">sudo</span> curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo<br><br><span class="hljs-comment"># 2. 安装基础工具</span><br><br><span class="hljs-built_in">sudo</span> yum install -y vim wget net-tools yum-utils<br><br><span class="hljs-comment"># 3. 防火墙配置（开放80/443/22端口）</span><br><br><span class="hljs-built_in">sudo</span> firewall-cmd --permanent --add-service=http<br><br><span class="hljs-built_in">sudo</span> firewall-cmd --permanent --add-service=https<br><br><span class="hljs-built_in">sudo</span> firewall-cmd --permanent --add-port=22/tcp<br><br><span class="hljs-built_in">sudo</span> firewall-cmd --reload<br><br> <span class="hljs-comment">#或者停止防火墙服务</span><br> <br>systemctl stop firewalld<br>systemctl <span class="hljs-built_in">disable</span> firewalld<br><br><span class="hljs-comment"># 4. SELinux配置（避免权限拦截，核心步骤）</span><br><br><span class="hljs-built_in">sudo</span> setenforce 0  <span class="hljs-comment"># 临时关闭（测试环境）</span><br><br><span class="hljs-built_in">sudo</span> sed -i <span class="hljs-string">&#x27;s/SELINUX=enforcing/SELINUX=disabled/&#x27;</span> /etc/selinux/config  <span class="hljs-comment"># 永久关闭（需重启）</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-依赖环境检查"><a href="#2-依赖环境检查" class="headerlink" title="2. 依赖环境检查"></a>2. 依赖环境检查</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 检查是否已安装冲突服务（如Apache httpd），如有则卸载</span><br><br>rpm -qa | grep httpd &amp;&amp; <span class="hljs-built_in">sudo</span> yum remove -y httpd<br></code></pre></td></tr></table></figure>
+
+<h2 id="三、核心组件安装与配置"><a href="#三、核心组件安装与配置" class="headerlink" title="三、核心组件安装与配置"></a>三、核心组件安装与配置</h2><h3 id="（一）Nginx-安装与基础配置"><a href="#（一）Nginx-安装与基础配置" class="headerlink" title="（一）Nginx 安装与基础配置"></a>（一）Nginx 安装与基础配置</h3><h4 id="1-安装-Nginx（通过-EPEL-源，避免报错）"><a href="#1-安装-Nginx（通过-EPEL-源，避免报错）" class="headerlink" title="1. 安装 Nginx（通过 EPEL 源，避免报错）"></a>1. 安装 Nginx（通过 EPEL 源，避免报错）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装阿里云EPEL源（解决默认EPEL源无法访问问题）</span><br><br><span class="hljs-built_in">sudo</span> curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo<br><br><span class="hljs-built_in">sudo</span> yum repolist | grep epel  <span class="hljs-comment"># 验证仓库是否生效</span><br><br><span class="hljs-comment"># 安装Nginx</span><br><br><span class="hljs-built_in">sudo</span> yum install -y nginx<br><br><span class="hljs-comment"># 启动并设置开机自启</span><br><br><span class="hljs-built_in">sudo</span> systemctl start nginx<br><br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> nginx<br><br><span class="hljs-comment"># 验证Nginx状态（确保显示 active (running)）</span><br><br><span class="hljs-built_in">sudo</span> systemctl status nginx<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-基础配置验证"><a href="#2-基础配置验证" class="headerlink" title="2. 基础配置验证"></a>2. 基础配置验证</h4><ul>
+<li><p>浏览器访问 <code>http://服务器IP</code>，出现 “Welcome to nginx!” 页面即安装成功</p>
+</li>
+<li><p>核心配置文件路径：</p>
+<ul>
+<li><p>主配置文件：<code>/etc/nginx/nginx.conf</code></p>
+</li>
+<li><p>虚拟主机配置目录：<code>/etc/nginx/conf.d/</code>（默认配置文件：<code>default.conf</code>）</p>
+</li>
+<li><p>网站根目录（默认）：<code>/usr/share/nginx/html</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="（二）MariaDB-安装与安全配置"><a href="#（二）MariaDB-安装与安全配置" class="headerlink" title="（二）MariaDB 安装与安全配置"></a>（二）MariaDB 安装与安全配置</h3><h4 id="1-安装与启动"><a href="#1-安装与启动" class="headerlink" title="1. 安装与启动"></a>1. 安装与启动</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装MariaDB服务器与客户端</span><br><br><span class="hljs-built_in">sudo</span> yum install -y mariadb-server mariadb<br><br><span class="hljs-comment"># 启动并设置开机自启</span><br><br><span class="hljs-built_in">sudo</span> systemctl start mariadb<br><br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> mariadb<br><br><span class="hljs-comment"># 安全初始化（必做！设置root密码、禁用匿名用户）</span><br><br><span class="hljs-built_in">sudo</span> mysql_secure_installation<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>初始化步骤提示：</li>
+</ul>
+<ol>
+<li>无初始密码，直接回车 → 2. 设置 root 强密码 → 3. 全选 <code>Y</code>（删除匿名用户、禁止 root 远程登录、删除测试库、刷新权限）</li>
+</ol>
+<h4 id="2-数据库用户与权限配置"><a href="#2-数据库用户与权限配置" class="headerlink" title="2. 数据库用户与权限配置"></a>2. 数据库用户与权限配置</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 登录数据库</span><br><br>mysql -u root -p<br><br><span class="hljs-comment"># 创建应用数据库</span><br><br>CREATE DATABASE wordpress_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;<br><br><span class="hljs-comment"># 创建专用数据库用户并授权</span><br><br>CREATE USER <span class="hljs-string">&#x27;wp_user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;StrongPass@2025&#x27;</span>;<br><br>GRANT ALL PRIVILEGES ON wordpress_db.* TO <span class="hljs-string">&#x27;wp_user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span>;<br><br><br><span class="hljs-comment">#或：grant all privileges on *.* to root@&#x27;%&#x27; identified by &quot;000000&quot;; </span><br><br>FLUSH PRIVILEGES;<br><br><span class="hljs-comment"># 退出数据库</span><br><br>EXIT;<br></code></pre></td></tr></table></figure>
+
+<h3 id="（三）PHP-与-PHP-FPM-安装配置（核心联动步骤）"><a href="#（三）PHP-与-PHP-FPM-安装配置（核心联动步骤）" class="headerlink" title="（三）PHP 与 PHP-FPM 安装配置（核心联动步骤）"></a>（三）PHP 与 PHP-FPM 安装配置（核心联动步骤）</h3><h4 id="1-安装-PHP-及扩展（以-PHP7-4-为例，兼容主流应用）"><a href="#1-安装-PHP-及扩展（以-PHP7-4-为例，兼容主流应用）" class="headerlink" title="1. 安装 PHP 及扩展（以 PHP7.4 为例，兼容主流应用）"></a>1. 安装 PHP 及扩展（以 PHP7.4 为例，兼容主流应用）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装Remi源（支持高版本PHP）</span><br><br><span class="hljs-built_in">sudo</span> yum install -y http://mirrors.aliyun.com/remi/enterprise/remi-release-7.rpm<br><br><span class="hljs-comment"># 启用PHP7.4仓库</span><br><br><span class="hljs-built_in">sudo</span> yum-config-manager --<span class="hljs-built_in">enable</span> remi-php74<br><br><span class="hljs-comment"># 安装PHP及核心扩展（适配网站运行需求）</span><br><br><span class="hljs-built_in">sudo</span> yum install -y php php-fpm php-mysqlnd php-gd php-mbstring php-xml php-curl php-zip php-opcache<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-关键配置（Nginx-与-PHP-FPM-联动）"><a href="#2-关键配置（Nginx-与-PHP-FPM-联动）" class="headerlink" title="2. 关键配置（Nginx 与 PHP-FPM 联动）"></a>2. 关键配置（Nginx 与 PHP-FPM 联动）</h4><h5 id="（1）修改-PHP-FPM-用户组（适配-Nginx-权限）"><a href="#（1）修改-PHP-FPM-用户组（适配-Nginx-权限）" class="headerlink" title="（1）修改 PHP-FPM 用户组（适配 Nginx 权限）"></a>（1）修改 PHP-FPM 用户组（适配 Nginx 权限）</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> vim /etc/php-fpm.d/www.conf<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>替换以下配置（默认用户为 apache，需改为 nginx）：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">user = nginx<br><br>group = nginx<br><br>listen = 127.0.0.1:9000  <span class="hljs-comment"># 保持TCP监听（或使用unix:/tmp/php-cgi.sock）</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="（2）启动-PHP-FPM-并设置自启"><a href="#（2）启动-PHP-FPM-并设置自启" class="headerlink" title="（2）启动 PHP-FPM 并设置自启"></a>（2）启动 PHP-FPM 并设置自启</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> systemctl start php-fpm<br><br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> php-fpm<br><br><span class="hljs-built_in">sudo</span> systemctl status php-fpm  <span class="hljs-comment"># 验证状态</span><br><br><span class="hljs-built_in">sudo</span> netstat -nptl <span class="hljs-comment">#查看工作端口</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="（3）配置-Nginx-支持-PHP-解析（核心联动）"><a href="#（3）配置-Nginx-支持-PHP-解析（核心联动）" class="headerlink" title="（3）配置 Nginx 支持 PHP 解析（核心联动）"></a>（3）配置 Nginx 支持 PHP 解析（核心联动）</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> vim /etc/nginx/conf.d/default.conf<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>替换 <code>server</code> 区块内容（确保 PHP 脚本能被正确解析）：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br><br>   listen 80;<br><br>   server_name 服务器IP/域名;  <span class="hljs-comment"># 替换为实际IP或域名</span><br><br>   location / &#123;<br>      <br>       root /usr/share/nginx/html;  <span class="hljs-comment"># 网站根目录</span><br><br>       index index.php index.html index.htm;  <span class="hljs-comment"># 优先加载index.php</span><br><br>       try_files <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ =404;  <span class="hljs-comment"># 防止路径遍历</span><br>       <br>   &#125;<br><br>   <span class="hljs-comment"># PHP脚本处理规则（关键配置）</span><br><br>   location ~ \.php$ &#123;<br><br>       fastcgi_pass 127.0.0.1:9000;  <span class="hljs-comment"># 与PHP-FPM监听地址一致</span><br><br>       fastcgi_index index.php;<br><br>       fastcgi_param SCRIPT_FILENAME $document_root<span class="hljs-variable">$fastcgi_script_name</span>;  <span class="hljs-comment"># 脚本路径拼接</span><br><br>       include fastcgi_params;  <span class="hljs-comment"># 加载FastCGI参数</span><br><br>   &#125;<br><br>   <span class="hljs-comment"># 静态资源缓存优化（补充配置）</span><br><br>   location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$ &#123;<br><br>       expires 30d;  <span class="hljs-comment"># 图片缓存30天</span><br><br>   &#125;<br><br>   location ~ .*\.(js|css)?$ &#123;<br><br>       expires 12h;  <span class="hljs-comment"># 脚本样式缓存12小时</span><br><br>   &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="（4）验证-Nginx-配置并重启"><a href="#（4）验证-Nginx-配置并重启" class="headerlink" title="（4）验证 Nginx 配置并重启"></a>（4）验证 Nginx 配置并重启</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> nginx -t  <span class="hljs-comment"># 检查配置语法（无错误提示则正常）</span><br><br><span class="hljs-built_in">sudo</span> systemctl restart nginx  <span class="hljs-comment"># 重启生效</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-环境验证"><a href="#3-环境验证" class="headerlink" title="3. 环境验证"></a>3. 环境验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建PHP信息测试文件</span><br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;?php phpinfo(); ?&gt;&quot;</span> | <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">tee</span> /usr/share/nginx/html/info.php<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>浏览器访问 <code>http://服务器IP/info.php</code>，显示 PHP 版本及扩展信息即配置成功</li>
+</ul>
+<h3 id="（四）虚拟主机配置（多网站部署，补充内容）"><a href="#（四）虚拟主机配置（多网站部署，补充内容）" class="headerlink" title="（四）虚拟主机配置（多网站部署，补充内容）"></a>（四）虚拟主机配置（多网站部署，补充内容）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建虚拟主机配置文件</span><br><br><span class="hljs-built_in">sudo</span> vim /etc/nginx/conf.d/example.conf<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>配置示例：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br><br>   listen 80;<br><br>   server_name www.example.com example.com;  <span class="hljs-comment"># 绑定域名</span><br><br>   <br><br>   location / &#123;<br>   <br>       root  /usr/share/nginx/html;   <span class="hljs-comment"># 自定义网站目录</span><br><br>       index index.php index.html;<br>       <br>       try_files <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ =404;<br><br>   &#125;<br><br>   location ~\.php$ &#123;<br><br>       fastcgi_pass 127.0.0.1:9000;<br>       <br>       root /usr/share/nginx/html; <br><br>       fastcgi_index index.php;<br><br>       fastcgi_param SCRIPT_FILENAME $document_root<span class="hljs-variable">$fastcgi_script_name</span>;<br><br>       include fastcgi_params;<br><br>   &#125;<br><br>   access_log /var/log/nginx/example_access.log;  <span class="hljs-comment"># 访问日志</span><br><br>   error_log /var/log/nginx/example_error.log;    <span class="hljs-comment"># 错误日志</span><br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>创建目录并授权：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> -p  /usr/share/nginx/html<br><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chown</span> -R nginx:nginx /usr/share/nginx/html<br><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chmod</span> -R 755 /usr/share/nginx/html<br><br><span class="hljs-built_in">sudo</span> nginx -t &amp;&amp; <span class="hljs-built_in">sudo</span> systemctl restart nginx<br><span class="hljs-comment">#或重新加载 nginx 使配置文件生效：nginx -s reload </span><br></code></pre></td></tr></table></figure>
+
+<h2 id="四、应用部署实战（以-WordPress-为例）"><a href="#四、应用部署实战（以-WordPress-为例）" class="headerlink" title="四、应用部署实战（以 WordPress 为例）"></a>四、应用部署实战（以 WordPress 为例）</h2><h3 id="1-下载与解压"><a href="#1-下载与解压" class="headerlink" title="1. 下载与解压"></a>1. 下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 进入网站根目录（以默认目录为例）</span><br><br><span class="hljs-built_in">cd</span> /usr/share/nginx/html<br><br><span class="hljs-comment"># 下载WordPress安装包</span><br><br>wget https://wordpress.org/latest.tar.gz<br><br><span class="hljs-comment"># 解压并授权</span><br><br>tar -xzvf latest.tar.gz<br><br><span class="hljs-built_in">mv</span> wordpress/* ./<br><br><span class="hljs-built_in">rm</span> -rf wordpress latest.tar.gz<br><br><span class="hljs-comment"># 设置权限（关键！避免访问报错）</span><br><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chown</span> -R nginx:nginx /usr/share/nginx/html<br><br><span class="hljs-built_in">sudo</span> find /usr/share/nginx/html -<span class="hljs-built_in">type</span> d -<span class="hljs-built_in">exec</span> <span class="hljs-built_in">chmod</span> 755 &#123;&#125; \;<br><br><span class="hljs-built_in">sudo</span> find /usr/share/nginx/html -<span class="hljs-built_in">type</span> f -<span class="hljs-built_in">exec</span> <span class="hljs-built_in">chmod</span> 644 &#123;&#125; \;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-修改数据库相关配置"><a href="#2-修改数据库相关配置" class="headerlink" title="2. 修改数据库相关配置"></a>2. 修改数据库相关配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#复制模板配置</span><br><br><span class="hljs-built_in">cp</span> wp-config_sample.conf wp-config.conf <br><br>vi wp-config.conf <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">... <br>/** WordPress 数据库的名称 */ <br>define(<span class="hljs-string">&#x27;DB_NAME&#x27;</span>, <span class="hljs-string">&#x27;wordpress&#x27;</span>); <br><br>/** MySQL 数据库用户名 */ <br>define(<span class="hljs-string">&#x27;DB_USER&#x27;</span>, <span class="hljs-string">&#x27;root&#x27;</span>); <br><br>/** MySQL 数据库密码 */ <br>define(<span class="hljs-string">&#x27;DB_PASSWORD&#x27;</span>, <span class="hljs-string">&#x27;000000&#x27;</span>); <br><br>/** MySQL 主机 */ <br>define(<span class="hljs-string">&#x27;DB_HOST&#x27;</span>, <span class="hljs-string">&#x27;localhost&#x27;</span>); <br><br>/** 创建数据表时默认的文字编码 */ <br>define(<span class="hljs-string">&#x27;DB_CHARSET&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>); <br><br>/** 数据库整理类型。如不确定请勿更改 */ <br>define(<span class="hljs-string">&#x27;DB_COLLATE&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>); <br>... <br></code></pre></td></tr></table></figure>
+
+<h3 id="3-安装流程"><a href="#3-安装流程" class="headerlink" title="3. 安装流程"></a>3. 安装流程</h3><ol>
+<li><p>浏览器访问 <code>http://服务器IP</code>， 点击 “现在就开始”</p>
+</li>
+<li><p>输入数据库信息（前面创建的 <code>wordpress_db</code>、<code>wp_user</code>、密码）</p>
+</li>
+<li><p>填写网站标题、管理员账号密码 → 完成安装</p>
+</li>
+</ol>
+<h3 id="4-适配注意事项"><a href="#4-适配注意事项" class="headerlink" title="4. 适配注意事项"></a>4. 适配注意事项</h3><ul>
+<li><p>PHP5.4.x 仅支持 WordPress 3.7-4.9.x（需升级 PHP 版本以适配新版 WordPress）</p>
+</li>
+<li><p>若提示 “缺少 MySQL 扩展”，重新安装扩展：<code>sudo yum install -y php-mysqlnd</code></p>
+</li>
+</ul>
+<h2 id="五、HTTPS-配置（双服务器架构：CA-Web，补充内容）"><a href="#五、HTTPS-配置（双服务器架构：CA-Web，补充内容）" class="headerlink" title="五、HTTPS 配置（双服务器架构：CA+Web，补充内容）"></a>五、HTTPS 配置（双服务器架构：CA+Web，补充内容）</h2><h3 id="（一）CA-服务器配置（参考-LAMP-架构-CA-配置，适配-LNMP）"><a href="#（一）CA-服务器配置（参考-LAMP-架构-CA-配置，适配-LNMP）" class="headerlink" title="（一）CA 服务器配置（参考 LAMP 架构 CA 配置，适配 LNMP）"></a>（一）CA 服务器配置（参考 LAMP 架构 CA 配置，适配 LNMP）</h3><ol>
+<li><p>生成根证书（同 LAMP 步骤，路径不变）</p>
+</li>
+<li><p>签署 Web 服务器证书（流程一致）</p>
+</li>
+</ol>
+<h3 id="（二）Web-服务器（Nginx）HTTPS-配置"><a href="#（二）Web-服务器（Nginx）HTTPS-配置" class="headerlink" title="（二）Web 服务器（Nginx）HTTPS 配置"></a>（二）Web 服务器（Nginx）HTTPS 配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 编辑Nginx SSL配置文件</span><br><br><span class="hljs-built_in">sudo</span> vim /etc/nginx/conf.d/ssl.conf<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>配置示例：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br><br>   listen 443 ssl;<br><br>   server_name 服务器IP/域名;<br><br>   <span class="hljs-comment"># 证书路径（替换为实际路径）</span><br><br>   ssl_certificate /etc/nginx/ssl/web.crt;  <span class="hljs-comment"># CA签署的服务器证书</span><br><br>   ssl_certificate_key /etc/nginx/ssl/web.key;  <span class="hljs-comment"># Web服务器私钥</span><br><br>   ssl_trusted_certificate /etc/nginx/ssl/cacert.pem;  <span class="hljs-comment"># CA根证书</span><br><br>   <span class="hljs-comment"># SSL优化配置（补充）</span><br><br>   ssl_protocols TLSv1.2 TLSv1.3;<br><br>   ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;<br><br>   ssl_prefer_server_ciphers on;<br><br>   root /usr/share/nginx/html;<br><br>   index index.php index.html;<br><br>   location ~ \.php$ &#123;<br><br>       fastcgi_pass 127.0.0.1:9000;<br><br>       fastcgi_index index.php;<br><br>       fastcgi_param SCRIPT_FILENAME $document_root<span class="hljs-variable">$fastcgi_script_name</span>;<br><br>       include fastcgi_params;<br><br>   &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>重启 Nginx：<code>sudo systemctl restart nginx</code></p>
+</li>
+<li><p>测试访问：<code>https://服务器IP</code>（自签名证书首次访问需忽略信任警告）</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CentOS-7/" class="print-no-link">#CentOS 7</a>
+      
+        <a href="/tags/LNMP/" class="print-no-link">#LNMP</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LNMP架构搭建wordpress博客</div>
+      <div>https://netguy6.github.io/2025/10/30/LNMP架构搭建wordpress博客/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>net06</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/10/29/LAMP%E6%9E%B6%E6%9E%84%E6%90%AD%E5%BB%BADiscuz%20%E8%AE%BA%E5%9D%9B%E7%BD%91%E7%AB%99/" title="LAMP架构搭建Discuz 论坛网站">
+                        <span class="hidden-mobile">LAMP架构搭建Discuz 论坛网站</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
