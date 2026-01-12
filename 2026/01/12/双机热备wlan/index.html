@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/pictogram.png">
+  <link rel="icon" href="/img/pictogram.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="net06">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="第一部分：基础网络配置 (AC1 &amp; AC2)这部分是为了让两台 AC 能够“连得通”网络和彼此。    命令 详细解释    vlan batch 2 199 200 创建 VLAN：一次性创建三个 VLAN。VLAN 2 用于管理 AP，VLAN 199 用于两台 AC 之间的心跳（数据同步），VLAN 200 用于连接外网。   int g0&#x2F;0&#x2F;1  port link-type">
+<meta property="og:type" content="article">
+<meta property="og:title" content="双机热备wlan">
+<meta property="og:url" content="https://netguy6.github.io/2026/01/12/%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87wlan/index.html">
+<meta property="og:site_name" content="net06">
+<meta property="og:description" content="第一部分：基础网络配置 (AC1 &amp; AC2)这部分是为了让两台 AC 能够“连得通”网络和彼此。    命令 详细解释    vlan batch 2 199 200 创建 VLAN：一次性创建三个 VLAN。VLAN 2 用于管理 AP，VLAN 199 用于两台 AC 之间的心跳（数据同步），VLAN 200 用于连接外网。   int g0&#x2F;0&#x2F;1  port link-type">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-12T13:51:24.000Z">
+<meta property="article:modified_time" content="2026-01-12T13:58:13.000Z">
+<meta property="article:author" content="net06">
+<meta property="article:tag" content="双机热备">
+<meta property="article:tag" content="vrrp">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>双机热备wlan - net06</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"netguy6.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>net06</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/business.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="双机热备wlan"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-12 21:51" pubdate>
+          2026年1月12日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">双机热备wlan</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="第一部分：基础网络配置-AC1-AC2"><a href="#第一部分：基础网络配置-AC1-AC2" class="headerlink" title="第一部分：基础网络配置 (AC1 &amp; AC2)"></a>第一部分：基础网络配置 (AC1 &amp; AC2)</h3><p>这部分是为了让两台 AC 能够“连得通”网络和彼此。</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">详细解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>vlan batch 2 199 200</code></strong></td>
+<td align="left"><strong>创建 VLAN</strong>：一次性创建三个 VLAN。VLAN 2 用于管理 AP，VLAN 199 用于两台 AC 之间的心跳（数据同步），VLAN 200 用于连接外网。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>int g0/0/1</code></strong>  <strong><code>port link-type trunk</code></strong>  <strong><code>port trunk allow-pass vlan 2 199 200</code></strong></td>
+<td align="left"><strong>配置互联接口</strong>：进入 GigabitEthernet 0&#x2F;0&#x2F;1 接口，将其设为 Trunk 模式，并允许 VLAN 2、199、200 的数据通过，连接到交换机。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>int vlanif2</code></strong>  <strong><code>ip add 192.168.2.252 24</code></strong>  <em>(AC2: 253)</em></td>
+<td align="left"><strong>配置 AP 管理 IP</strong>：创建 VLANIF 逻辑接口并配置 IP。这是 AP 获取管理地址的网段。AC1 地址为 .252，AC2 地址为 .253。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>int vlanif199</code></strong>  <strong><code>ip add 192.168.199.254 24</code></strong>  <em>(AC2: 253)</em></td>
+<td align="left"><strong>配置 HSB 心跳 IP</strong>：专门用于两台 AC 之间同步数据的链路。AC1 是 .254，AC2 是 .253。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>int vlanif200</code></strong>  <strong><code>ip add 192.168.200.252 24</code></strong>  <em>(AC2: 253)</em></td>
+<td align="left"><strong>配置上行链路 IP</strong>：连接核心交换机或出口网关的接口，用于 AC 访问外网。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>ip route-static 0.0.0.0 0 192.168.200.1</code></strong></td>
+<td align="left"><strong>配置默认路由</strong>：设置网关下一跳为 192.168.200.1，保证 AC 能够上网。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="第二部分：VRRP-网关冗余配置-AC1-AC2"><a href="#第二部分：VRRP-网关冗余配置-AC1-AC2" class="headerlink" title="第二部分：VRRP 网关冗余配置 (AC1 &amp; AC2)"></a>第二部分：VRRP 网关冗余配置 (AC1 &amp; AC2)</h3><p>这部分是为了让两台 AC 虚拟成一台设备，对外提供一个不变的“虚拟网关”。</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">详细解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>int vlanif200</code></strong>  <strong><code>vrrp vrid 200 virtual-ip 192.168.200.254</code></strong></td>
+<td align="left"><strong>创建 VRRP 组 (上行)</strong>：在上行接口创建 VRRP 备份组 200，虚拟 IP 设为 .254。用户或 AP 访问外网时，网关填这个地址。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>vrrp vrid 200 priority 150</code></strong>  <em>(AC1:150, AC2:120)</em></td>
+<td align="left"><strong>设置优先级</strong>：决定谁是主谁是备。<strong>AC1 设为 150</strong>（高），将成为 Master；<strong>AC2 设为 120</strong>（低），将成为 Backup。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>admin-vrrp vrid 200</code></strong></td>
+<td align="left"><strong>配置管理 VRRP</strong>：指定 VRRP 200 为“管理员”组。这意味着这台设备的角色（主&#x2F;备）由这个组的状态决定，防止角色混乱。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>int vlanif2</code></strong>  <strong><code>vrrp vrid 2 virtual-ip 192.168.2.254</code></strong></td>
+<td align="left"><strong>创建 VRRP 组 (AP管理)</strong>：在 AP 管理网段也创建一个 VRRP 组，虚拟 IP 为 .254。这是 AP 的默认网关。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>vrrp vrid 2 priority 150</code></strong>  <em>(AC1:150, AC2:120)</em></td>
+<td align="left"><strong>同步优先级</strong>：同样配置优先级，保持与上行链路一致，确保 AC1 同时是两个网段的主设备。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>vrrp vrid 2 track admin-vrrp int vlan 200 vrid 200 unflowdown</code></strong></td>
+<td align="left"><strong>配置联动追踪</strong>：这是关键命令。意思是：Vlanif2 的 VRRP 状态要跟踪 Vlanif200 的状态。<strong>如果 AC1 的上行网线断了</strong>（Vlanif200 失效），AC1 会自动降低自己在 Vlanif2 的优先级，强制让 AC2 接管 AP 管理权，避免“有线断了但无线连不上”的死循环。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="第三部分：双机热备-HSB-配置"><a href="#第三部分：双机热备-HSB-配置" class="headerlink" title="第三部分：双机热备 (HSB) 配置"></a>第三部分：双机热备 (HSB) 配置</h3><p>这部分是为了让 AC2 实时备份 AC1 的数据（如 AP 上线信息、用户密码等），实现断网不掉线。</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">详细解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>hsb-service 0</code></strong>  <strong><code>service-ip-port local-ip 192.168.199.254 peer-ip 192.168.199.253 ...</code></strong></td>
+<td align="left"><strong>建立同步通道</strong>：创建 HSB 服务 0。配置本端 IP 和对端 IP（Peer IP）。AC1 的本端是 .254，对端填 AC2 的 .253；AC2 则相反。这是数据同步的管道。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>hsb-group 0</code></strong>  <strong><code>bind-service 0</code></strong></td>
+<td align="left"><strong>绑定服务通道</strong>：创建 HSB 备份组 0，并将其与上面创建的“服务通道 0”绑定，打通数据通路。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>track vrrp vrid 200 int vlan 200</code></strong></td>
+<td align="left"><strong>监控 VRRP 状态</strong>：HSB 备份组开始监控 VRRP 200 的状态。如果 VRRP 发生主备切换，HSB 也会跟着切换数据流向。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>hsb-service-type ap hsb-group 0</code></strong></td>
+<td align="left"><strong>开启 AP 信息备份</strong>：告诉 AC，要把 AP 的上线状态、配置等信息通过 HSB 组 0 实时同步给对端。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>hsb-service-type dhcp hsb-group 0</code></strong></td>
+<td align="left"><strong>开启 DHCP 信息备份</strong>：如果 AC 开启了 DHCP 服务，需要同步地址池的占用情况，防止备机分配出重复 IP。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>capwap source ip-address 192.168.200.254</code></strong></td>
+<td align="left"><strong>固定隧道源地址</strong>：关键命令！配置 AC 与 AP 通信的源 IP 为 <strong>VRRP 虚拟 IP</strong> (.254)。这样无论主备怎么切换，AP 只认 .254 这个地址，不需要重新建立连接。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="第四部分：最后的收尾"><a href="#第四部分：最后的收尾" class="headerlink" title="第四部分：最后的收尾"></a>第四部分：最后的收尾</h3><table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">详细解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>hsb enable</code></strong></td>
+<td align="left"><strong>启动热备功能</strong>：在 HSB 组视图下执行此命令，真正激活双机热备功能。执行后，两台 AC 会开始建立连接并同步数据。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>wlan</code></strong>  … <em>(AP和VAP配置)</em></td>
+<td align="left"><strong>业务配置</strong>：这部分是 WLAN 的基础业务（如 SSID 名字、密码等）。<strong>注意</strong>：这些配置需要在两台 AC 上手动保持一致，或者通过 AC1 同步给 AC2，否则切换时业务会中断。</td>
+</tr>
+</tbody></table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%8D%8E%E4%B8%BAensp/" class="category-chain-item">华为ensp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87/" class="print-no-link">#双机热备</a>
+      
+        <a href="/tags/vrrp/" class="print-no-link">#vrrp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>双机热备wlan</div>
+      <div>https://netguy6.github.io/2026/01/12/双机热备wlan/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>net06</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/10/%E4%BA%91%E8%AE%A1%E7%AE%97%E5%B9%B3%E5%8F%B0%E8%BF%90%E7%BB%B4%E4%B8%8E%E5%BA%94%E7%94%A8/" title="云计算平台运维与应用">
+                        <span class="hidden-mobile">云计算平台运维与应用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
